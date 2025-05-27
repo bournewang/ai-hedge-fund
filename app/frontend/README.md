@@ -5,7 +5,7 @@ This is the frontend application for the AI Hedge Fund project. It provides a we
 
 ## Overview
 
-This frontend project is built with React and Vite, serving as the client-side component of the AI Hedge Fund system. It connects to the backend API to provide a user-friendly interface for managing the hedge fund trading system and backtester.
+This frontend project is built with React and Vite, serving as the client-side component of the AI Hedge Fund system. It connects to the backend API to provide a user-friendly interface for managing the hedge fund trading system and backtester. The frontend now provides a primary user-friendly form (`SimpleRunForm.tsx`) for configuring and running hedge fund strategies, making it accessible to a wider range of users.
 
 ## Installation
 

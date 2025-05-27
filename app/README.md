@@ -12,7 +12,7 @@ The AI Hedge Fund app is a complete system with both frontend and backend compon
 The AI Hedge Fund consists of:
 
 - **Backend**: A FastAPI application that provides a REST API to run the hedge fund trading system and backtester
-- **Frontend**: A React/Vite application that offers a user-friendly interface to visualize and control the hedge fund operations
+- **Frontend**: A React/Vite application that offers a user-friendly interface to visualize and control the hedge fund operations. The web interface now offers a simplified form for easily running simulations, in addition to any advanced visualization tools.
 
 ## 🚀 Quick Start (For Non-Technical Users)
 
@@ -50,6 +50,8 @@ cd app && npm install && npm run setup
 2. Install all dependencies automatically
 3. Start both frontend and backend services
 4. **Automatically open your web browser** to the application
+
+The interface you'll see is designed for ease of use, allowing you to quickly start running simulations.
 
 **Requirements:**
 - [Node.js](https://nodejs.org/) (includes npm)
