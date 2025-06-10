@@ -1,5 +1,5 @@
 import { AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { useFlowContext } from '@/contexts/flow-context';
+// import { useFlowContext } from '@/contexts/flow-context'; // Removed
 import { ComponentGroup, ComponentItem } from '@/data/sidebar-components';
 import { SidebarItem } from './sidebar-item';
 
@@ -13,10 +13,12 @@ export function SidebarItemGroup({
   activeItem
 }: SidebarItemGroupProps) {
   const { name, icon: Icon, iconColor, items } = group;
-  const { addComponentToFlow } = useFlowContext();
+  // const { addComponentToFlow } = useFlowContext(); // Removed
 
   const handleItemClick = (componentName: string) => {
-    addComponentToFlow(componentName);
+    // addComponentToFlow(componentName); // Removed
+    console.log(`SidebarItem clicked: ${componentName}. Action to be defined.`);
+    // This handler can be updated later if these items have a new role (e.g., navigation)
   };
   
   return (
