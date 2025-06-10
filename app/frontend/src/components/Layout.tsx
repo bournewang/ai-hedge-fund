@@ -1,7 +1,7 @@
 import { SidebarProvider } from '@/components/ui/sidebar';
-import { FlowProvider } from '@/contexts/flow-context';
+// import { FlowProvider } from '@/contexts/flow-context'; // Removed
 import { cn } from '@/lib/utils';
-import { ReactFlowProvider } from '@xyflow/react';
+// import { ReactFlowProvider } from '@xyflow/react'; // Removed
 import { PanelLeft } from 'lucide-react';
 import { ReactNode, useState } from 'react';
 import { LeftSidebar } from './sidebar/left-sidebar';
@@ -19,8 +19,8 @@ export function Layout({ leftSidebar, rightSidebar, children }: LayoutProps) {
   return (
     <SidebarProvider defaultOpen={!isCollapsed}>
       <div className="flex h-screen w-screen overflow-hidden relative bg-background">
-        <ReactFlowProvider>
-          <FlowProvider>
+        {/* <ReactFlowProvider> */} {/* Removed */}
+          {/* <FlowProvider> */} {/* Removed */}
             {/* Main content area takes full width */}
             <main className="flex-1 h-full overflow-hidden w-full">
               {children}
@@ -58,8 +58,8 @@ export function Layout({ leftSidebar, rightSidebar, children }: LayoutProps) {
                 {rightSidebar}
               </div>
             )}
-          </FlowProvider>
-        </ReactFlowProvider>
+          {/* </FlowProvider> */} {/* Removed */}
+        {/* </ReactFlowProvider> */} {/* Removed */}
       </div>
     </SidebarProvider>
   );
