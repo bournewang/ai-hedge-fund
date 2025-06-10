@@ -3,8 +3,8 @@ import { Layout } from './components/layout';
 import { ExploreView } from './components/explore/ExploreView';
 import { StyleSection } from './components/styles/StyleSection';
 import { TickerDetailView } from './components/common/TickerDetailView';
-import { MonitorView } from './components/monitor/MonitorView'; // New import
-import { apiClient } from './services/api';
+import { MonitorView } from './components/monitor/MonitorView';
+import { api } from './services/api'; // Changed apiClient to api
 
 // Define a type for individual agent signal detail
 export interface AgentSignalDetail { // Exporting
@@ -117,23 +117,28 @@ export default function App() {
       setError(null);
       try {
         // 1. Fetch available cache keys
-        const keysResponse = await apiClient.get<string[]>('/cached-analysis/available-results-keys');
-        const keys = keysResponse.data;
+        const fetchedKeys = await api.get<string[]>('/cached-analysis/available-results-keys');
+        // Ensure fetchedKeys is an array before proceeding
+        const keys = Array.isArray(fetchedKeys) ? fetchedKeys : [];
+        if (!Array.isArray(fetchedKeys)) {
+            console.warn("Fetched keys for cached analysis is not an array:", fetchedKeys);
+        }
         setAvailableCacheKeys(keys);
 
         // 2. Fetch data for ALL available keys
         const fetchedData: AllAnalysisData = {};
 
-        for (const key of keys) { // Iterate over all keys
+        for (const key of keys) {
           try {
-            const resultResponse = await apiClient.get<any>(`/cached-analysis/results/${key}`);
-            const responseData = resultResponse.data; // e.g., { analyst_signals: [...], last_updated: ..., ... }
+            // api.get directly returns the parsed JSON object.
+            const responsePayload = await api.get<any>(`/cached-analysis/results/${key}`);
 
             let signalsData: AnalysisDataItem[] = [];
-            if (responseData && Array.isArray(responseData.analyst_signals)) {
-              signalsData = responseData.analyst_signals;
+            // The actual analysis data is expected under the 'analyst_signals' property of the responsePayload
+            if (responsePayload && Array.isArray(responsePayload.analyst_signals)) {
+              signalsData = responsePayload.analyst_signals;
             } else {
-              console.warn(`No 'analyst_signals' array found for key ${key}, or data is not in expected format.`);
+              console.warn(`No 'analyst_signals' array found for key ${key} in payload:`, responsePayload);
             }
 
             const styleNameFromKey = key.split('_')[0].replace(/([A-Z])/g, ' $1').trim() || "Analysis";
@@ -141,8 +146,7 @@ export default function App() {
 
           } catch (keyError) {
             console.error(`Error fetching data for key ${key}:`, keyError);
-            // Store empty or error state for this key if needed, or skip
-             fetchedData[key] = { styleName: key.split('_')[0].replace(/([A-Z])/g, ' $1').trim() || "Misc", data: [] };
+            fetchedData[key] = { styleName: key.split('_')[0].replace(/([A-Z])/g, ' $1').trim() || "Misc", data: [] };
           }
         }
         setAllAnalysisData(fetchedData);
