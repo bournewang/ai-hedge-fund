@@ -20,11 +20,13 @@ def fundamentals_analyst_agent(state: AgentState):
         progress.update_status("fundamentals_analyst_agent", ticker, "Fetching financial metrics")
 
         # Get the financial metrics
+        force_refresh = state.get("metadata", {}).get("force_refresh", False)
         financial_metrics = get_financial_metrics(
             ticker=ticker,
             end_date=end_date,
             period="ttm",
             limit=10,
+            force_refresh=force_refresh,
         )
 
         if not financial_metrics:

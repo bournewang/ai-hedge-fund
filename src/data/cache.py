@@ -15,7 +15,7 @@ class Cache:
         self._company_news_cache = diskcache.Cache(os.path.join(CACHE_DIR, 'company_news'))
         self._analysis_results_cache = diskcache.Cache(os.path.join(CACHE_DIR, 'analysis_results'))
 
-    def _merge_data(self, existing: list[dict] | None, new_data: list[dict], key_field: str) -> list[dict]:
+    def _merge_data(self, existing: list[dict] | None, new_data: list[dict], key_field: str) -> list[dict]:  # type: ignore
         """Merge existing and new data, avoiding duplicates based on a key field."""
         if not existing:
             return new_data
@@ -28,8 +28,10 @@ class Cache:
         merged.extend([item for item in new_data if item[key_field] not in existing_keys])
         return merged
 
-    def get_prices(self, ticker: str) -> list[dict[str, any]] | None:
+    def get_prices(self, ticker: str, force_refresh: bool = False) -> list[dict[str, any]] | None:
         """Get cached price data if available."""
+        if force_refresh:
+            return None
         return self._prices_cache.get(ticker)
 
     def set_prices(self, ticker: str, data: list[dict[str, any]]):
@@ -38,8 +40,10 @@ class Cache:
         merged_data = self._merge_data(existing_data, data, key_field="time")
         self._prices_cache.set(ticker, merged_data)
 
-    def get_financial_metrics(self, ticker: str) -> list[dict[str, any]] | None:
+    def get_financial_metrics(self, ticker: str, force_refresh: bool = False) -> list[dict[str, any]] | None:
         """Get cached financial metrics if available."""
+        if force_refresh:
+            return None
         return self._financial_metrics_cache.get(ticker)
 
     def set_financial_metrics(self, ticker: str, data: list[dict[str, any]]):
@@ -58,8 +62,10 @@ class Cache:
         merged_data = self._merge_data(existing_data, data, key_field="report_period")
         self._line_items_cache.set(ticker, merged_data)
 
-    def get_insider_trades(self, ticker: str) -> list[dict[str, any]] | None:
+    def get_insider_trades(self, ticker: str, force_refresh: bool = False) -> list[dict[str, any]] | None:
         """Get cached insider trades if available."""
+        if force_refresh:
+            return None
         return self._insider_trades_cache.get(ticker)
 
     def set_insider_trades(self, ticker: str, data: list[dict[str, any]]):
@@ -68,8 +74,10 @@ class Cache:
         merged_data = self._merge_data(existing_data, data, key_field="filing_date")  # Could also use transaction_date if preferred
         self._insider_trades_cache.set(ticker, merged_data)
 
-    def get_company_news(self, ticker: str) -> list[dict[str, any]] | None:
+    def get_company_news(self, ticker: str, force_refresh: bool = False) -> list[dict[str, any]] | None:
         """Get cached company news if available."""
+        if force_refresh:
+            return None
         return self._company_news_cache.get(ticker)
 
     def set_company_news(self, ticker: str, data: list[dict[str, any]]):
@@ -78,12 +86,14 @@ class Cache:
         merged_data = self._merge_data(existing_data, data, key_field="date")
         self._company_news_cache.set(ticker, merged_data)
 
-    def get_analysis_results(self, cache_key: str) -> dict | None:
-        """Get cached analysis results if available."""
+    def get_analysis_results(self, cache_key: str, force_refresh: bool = False) -> dict | None: # type: ignore
+        """Get cached analysis results if available, optionally forcing a cache bypass."""
+        if force_refresh:
+            return None
         return self._analysis_results_cache.get(cache_key)
 
-    def set_analysis_results(self, cache_key: str, data: dict):
-        """Set analysis results into cache."""
+    def set_analysis_results(self, cache_key: str, data: dict): # type: ignore
+        """Set analysis results into cache, overwriting any existing entry."""
         self._analysis_results_cache.set(cache_key, data)
 
 

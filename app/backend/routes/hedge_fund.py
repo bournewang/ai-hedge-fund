@@ -61,6 +61,7 @@ async def run_hedge_fund(request: HedgeFundRequest):
                         model_name=request.model_name,
                         model_provider=model_provider,
                         request=request,  # Pass the full request for agent-specific model access
+                        force_refresh=True,  # Add force_refresh parameter
                     )
                 )
                 # Send initial message

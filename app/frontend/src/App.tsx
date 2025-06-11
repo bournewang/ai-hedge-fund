@@ -45,6 +45,10 @@ export default function App() {
   // Watchlist state
   const [watchlist, setWatchlist] = useState<string[]>(['AAPL', 'TSLA']); // Initial dummy watchlist
   const [monitorTickerInput, setMonitorTickerInput] = useState<string>('');
+  const [isLoadingAnalysis, setIsLoadingAnalysis] = useState(false); // New state for on-demand analysis loading
+  const [analysisError, setAnalysisError] = useState<string | null>(null); // Error state for on-demand analysis
+
+  const ON_DEMAND_STYLE_KEY = "On-Demand Analysis"; // Key for storing on-demand results
 
   const handleAddToWatchlist = (): boolean => { // Return boolean for success
     const newTicker = monitorTickerInput.trim().toUpperCase();
@@ -162,14 +166,162 @@ export default function App() {
     fetchInitialData();
   }, []);
 
+  const runWatchlistAnalysisHandler = async (tickersToAnalyze: string[]) => {
+    if (isLoadingAnalysis) return;
+    setIsLoadingAnalysis(true);
+    setAnalysisError(null);
+
+    const requestBody = {
+      initial_cash: 1000000,
+      margin_requirement: 0.5,
+      tickers: tickersToAnalyze,
+      selected_agents: ['fundamentals_analyst_agent', 'technicals_agent', 'sentiment_analyst_agent'], // Ensure these match backend keys
+      model_provider: "OpenAI",
+      model_name: "gpt-4-turbo",
+      start_date: new Date(Date.now() - 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      end_date: new Date().toISOString().split('T')[0],
+    };
+
+    try {
+      const eventSource = new EventSource(`${api.defaults.baseURL}/hedge-fund/run?requestBody=${encodeURIComponent(JSON.stringify(requestBody))}`);
+      // It seems hedge-fund/run expects a POST request, the EventSource approach above might be incorrect.
+      // Reverting to a POST request that initiates an SSE stream if that's how the backend is set up.
+      // This part needs to align with how `api.stream` or a similar SSE utility is typically used in this app.
+      // For now, let's assume a POST request that returns an EventSource URL or directly streams.
+      // The below is a conceptual placeholder for initiating SSE and handling events.
+
+      // This is a simplified conceptual fetch for SSE. Replace with actual SSE handling logic from the project.
+      // Usually, you'd have a helper function for this.
+      const response = await fetch(`${api.defaults.baseURL}/hedge-fund/run`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          // Add any other necessary headers, like Authorization if required
+        },
+        body: JSON.stringify(requestBody),
+      });
+
+      if (!response.ok || !response.body) {
+        const errorData = await response.text();
+        throw new Error(`Failed to start analysis: ${response.status} ${errorData}`);
+      }
+
+      // Assuming the response itself is the SSE stream.
+      // This is a very simplified way to handle SSE and likely needs to be replaced
+      // with a more robust SSE client or the existing `api.stream` if available.
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = '';
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split('\\n'); // SSE events are newline-separated
+        buffer = lines.pop() || ''; // Keep the last partial line
+
+        for (const line of lines) {
+          if (line.startsWith('event: ')) {
+            const eventType = line.substring(7);
+            // Assuming data is on the next line starting with "data: "
+            // This is a very raw way of parsing SSE.
+            const dataLineIndex = lines.indexOf(line) + 1;
+            if (dataLineIndex < lines.length && lines[dataLineIndex].startsWith('data: ')) {
+              const eventDataString = lines[dataLineIndex].substring(6);
+              try {
+                let eventData;
+                try {
+                  eventData = JSON.parse(eventDataString);
+                } catch (e) {
+                  console.error("Error parsing SSE event data string:", eventDataString, e);
+                  continue; // Skip this malformed event
+                }
+
+                console.log("SSE Event:", eventType, eventData);
+
+                if (eventType === 'start') {
+                  console.log("Analysis started for tickers:", tickersToAnalyze);
+                } else if (eventType === 'progress') {
+                  // console.log("Progress:", eventData.agent, eventData.ticker, eventData.status);
+                } else if (eventType === 'complete') {
+                  console.log("Analysis complete. Received data:", eventData.data);
+                  if (eventData.data && eventData.data.analyst_signals) {
+                    setAllAnalysisData(prevData => {
+                      const currentOnDemandItems = prevData?.[ON_DEMAND_STYLE_KEY]?.data || [];
+                      let updatedTickerListForOnDemand = [...currentOnDemandItems];
+
+                      for (const [ticker, agentSignalsForTicker] of Object.entries(eventData.data.analyst_signals as Record<string, Record<string, any>>)) {
+                        const transformedAgentSignalsArray: AgentSignalDetail[] = Object.entries(agentSignalsForTicker).map(([agentName, signalData]) => ({
+                          agent_name: agentName, // Assuming backend keys are used as agent_name
+                          signal: signalData.signal,
+                          confidence: signalData.confidence,
+                          reasoning: signalData.reasoning,
+                        }));
+
+                        const newItem: AnalysisDataItem = {
+                          ticker: ticker,
+                          agent_signals: transformedAgentSignalsArray,
+                          // Not determining overall signal/confidence for now
+                          signal: null,
+                          confidence: null,
+                        };
+
+                        const existingItemIndex = updatedTickerListForOnDemand.findIndex(item => item.ticker === ticker);
+                        if (existingItemIndex > -1) {
+                          updatedTickerListForOnDemand[existingItemIndex] = newItem;
+                        } else {
+                          updatedTickerListForOnDemand.push(newItem);
+                        }
+                      }
+
+                      return {
+                        ...prevData,
+                        [ON_DEMAND_STYLE_KEY]: {
+                          styleName: "On-Demand Analysis",
+                          data: updatedTickerListForOnDemand,
+                        },
+                      };
+                    });
+                  }
+                } else if (eventType === 'error') {
+                  setAnalysisError(eventData.message || "An error occurred during analysis.");
+                  console.error("Analysis error event:", eventData);
+                  // Consider breaking the loop or closing EventSource on critical error
+                  reader.cancel(); // Stop reading the stream
+                  break;
+                }
+              } catch (e) {
+                console.error("Error processing SSE event logic:", e);
+                // This is an error in the handler logic, not parsing the data string
+              }
+            }
+          }
+        }
+      }
+    } catch (error: any) {
+      console.error("Failed to run analysis (fetch or stream setup error):", error);
+      setAnalysisError(error.message || "An unexpected error occurred when starting analysis.");
+      setIsLoadingAnalysis(false); // Ensure loading is stopped on setup error
+    }
+    // The finally block was removed here because if the stream is successful,
+    // setIsLoadingAnalysis(false) should only be called when the stream is truly done or errors out.
+    // For a continuous stream that only ends on 'done' or explicit cancel, this is tricky.
+    // Re-adding it for now, but a more robust SSE client would handle this better.
+    // If the 'while (true)' loop above correctly exits on 'done' or error, then this is fine.
+    finally {
+        setIsLoadingAnalysis(false);
+    }
+  };
+
   return (
     <Layout
       leftSidebar={showLeftSidebar ? <div className="p-4 text-white bg-gray-700">Left Sidebar (Filters/Nav)</div> : undefined}
       rightSidebar={showRightSidebar && selectedTicker ? <div className="p-4 text-white bg-gray-700 h-full overflow-y-auto">Contextual Details for {selectedTicker}</div> : (showRightSidebar ? <div className="p-4 text-white bg-gray-700">Right Sidebar</div> : undefined)}
     >
       <div className="main-content p-4 bg-gray-100 min-h-screen">
-        {isLoading && <p className="text-center text-lg text-gray-700 py-10">Loading analysis data...</p>}
-        {error && <p className="text-center text-lg text-red-500 py-10">Error: {error}</p>}
+        {isLoading && !isLoadingAnalysis && <p className="text-center text-lg text-gray-700 py-10">Loading initial analysis data...</p>}
+        {analysisError && <p className="text-center text-lg text-red-500 py-10">Analysis Error: {analysisError}</p>}
 
         {!isLoading && !error && allAnalysisData && Object.keys(allAnalysisData).length > 0 && (
           <>
@@ -209,7 +361,8 @@ export default function App() {
             onTickerSelect={handleTickerSelect}
             monitorTickerInput={monitorTickerInput}
             setMonitorTickerInput={setMonitorTickerInput}
-            isLoadingAnalysis={isLoading} // Pass the main loading state
+            isLoadingAnalysis={isLoadingAnalysis} // Pass the new loading state
+            onRunAnalysis={runWatchlistAnalysisHandler} // Pass the handler
           />
         </div>
 

@@ -22,16 +22,16 @@ from src.data.models import (
 _cache = get_cache()
 
 
-def get_prices(ticker: str, start_date: str, end_date: str) -> list[Price]:
+def get_prices(ticker: str, start_date: str, end_date: str, force_refresh: bool = False) -> list[Price]:
     """Fetch price data from cache or API."""
     # Create a cache key that includes all parameters to ensure exact matches
     cache_key = f"{ticker}_{start_date}_{end_date}"
     
     # Check cache first - simple exact match
-    if cached_data := _cache.get_prices(cache_key):
+    if cached_data := _cache.get_prices(cache_key, force_refresh=force_refresh):
         return [Price(**price) for price in cached_data]
 
-    # If not in cache, fetch from API
+    # If not in cache (or force_refresh caused it to be skipped), fetch from API
     headers = {}
     if api_key := os.environ.get("FINANCIAL_DATASETS_API_KEY"):
         headers["X-API-KEY"] = api_key
@@ -58,16 +58,17 @@ def get_financial_metrics(
     end_date: str,
     period: str = "ttm",
     limit: int = 10,
+    force_refresh: bool = False,
 ) -> list[FinancialMetrics]:
     """Fetch financial metrics from cache or API."""
     # Create a cache key that includes all parameters to ensure exact matches
     cache_key = f"{ticker}_{period}_{end_date}_{limit}"
     
     # Check cache first - simple exact match
-    if cached_data := _cache.get_financial_metrics(cache_key):
+    if cached_data := _cache.get_financial_metrics(cache_key, force_refresh=force_refresh):
         return [FinancialMetrics(**metric) for metric in cached_data]
 
-    # If not in cache, fetch from API
+    # If not in cache (or force_refresh caused it to be skipped), fetch from API
     headers = {}
     if api_key := os.environ.get("FINANCIAL_DATASETS_API_KEY"):
         headers["X-API-KEY"] = api_key
@@ -129,16 +130,17 @@ def get_insider_trades(
     end_date: str,
     start_date: str | None = None,
     limit: int = 1000,
+    force_refresh: bool = False,
 ) -> list[InsiderTrade]:
     """Fetch insider trades from cache or API."""
     # Create a cache key that includes all parameters to ensure exact matches
     cache_key = f"{ticker}_{start_date or 'none'}_{end_date}_{limit}"
     
     # Check cache first - simple exact match
-    if cached_data := _cache.get_insider_trades(cache_key):
+    if cached_data := _cache.get_insider_trades(cache_key, force_refresh=force_refresh):
         return [InsiderTrade(**trade) for trade in cached_data]
 
-    # If not in cache, fetch from API
+    # If not in cache (or force_refresh caused it to be skipped), fetch from API
     headers = {}
     if api_key := os.environ.get("FINANCIAL_DATASETS_API_KEY"):
         headers["X-API-KEY"] = api_key
@@ -189,16 +191,17 @@ def get_company_news(
     end_date: str,
     start_date: str | None = None,
     limit: int = 1000,
+    force_refresh: bool = False,
 ) -> list[CompanyNews]:
     """Fetch company news from cache or API."""
     # Create a cache key that includes all parameters to ensure exact matches
     cache_key = f"{ticker}_{start_date or 'none'}_{end_date}_{limit}"
     
     # Check cache first - simple exact match
-    if cached_data := _cache.get_company_news(cache_key):
+    if cached_data := _cache.get_company_news(cache_key, force_refresh=force_refresh):
         return [CompanyNews(**news) for news in cached_data]
 
-    # If not in cache, fetch from API
+    # If not in cache (or force_refresh caused it to be skipped), fetch from API
     headers = {}
     if api_key := os.environ.get("FINANCIAL_DATASETS_API_KEY"):
         headers["X-API-KEY"] = api_key
@@ -291,6 +294,6 @@ def prices_to_df(prices: list[Price]) -> pd.DataFrame:
 
 
 # Update the get_price_data function to use the new functions
-def get_price_data(ticker: str, start_date: str, end_date: str) -> pd.DataFrame:
-    prices = get_prices(ticker, start_date, end_date)
+def get_price_data(ticker: str, start_date: str, end_date: str, force_refresh: bool = False) -> pd.DataFrame:
+    prices = get_prices(ticker, start_date, end_date, force_refresh=force_refresh)
     return prices_to_df(prices)

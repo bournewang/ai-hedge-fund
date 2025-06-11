@@ -22,10 +22,12 @@ def sentiment_analyst_agent(state: AgentState):
         progress.update_status("sentiment_analyst_agent", ticker, "Fetching insider trades")
 
         # Get the insider trades
+        force_refresh = state.get("metadata", {}).get("force_refresh", False)
         insider_trades = get_insider_trades(
             ticker=ticker,
             end_date=end_date,
             limit=1000,
+            force_refresh=force_refresh,
         )
 
         progress.update_status("sentiment_analyst_agent", ticker, "Analyzing trading patterns")
@@ -37,7 +39,8 @@ def sentiment_analyst_agent(state: AgentState):
         progress.update_status("sentiment_analyst_agent", ticker, "Fetching company news")
 
         # Get the company news
-        company_news = get_company_news(ticker, end_date, limit=100)
+        force_refresh = state.get("metadata", {}).get("force_refresh", False)
+        company_news = get_company_news(ticker, end_date, limit=100, force_refresh=force_refresh)
 
         # Get the sentiment from the company news
         sentiment = pd.Series([n.sentiment for n in company_news]).dropna()

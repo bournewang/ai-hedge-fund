@@ -59,12 +59,14 @@ def charlie_munger_agent(state: AgentState):
         
         progress.update_status("charlie_munger_agent", ticker, "Fetching insider trades")
         # Munger values management with skin in the game
+        force_refresh = state.get("metadata", {}).get("force_refresh", False)
         insider_trades = get_insider_trades(
             ticker,
             end_date,
             # Look back 2 years for insider trading patterns
             start_date=None,
-            limit=100
+            limit=100,
+            force_refresh=force_refresh,
         )
         
         progress.update_status("charlie_munger_agent", ticker, "Fetching company news")

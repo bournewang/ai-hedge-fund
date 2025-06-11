@@ -10,6 +10,7 @@ interface MonitorViewProps {
   monitorTickerInput: string;
   setMonitorTickerInput: (value: string) => void;
   isLoadingAnalysis: boolean;
+  onRunAnalysis: (tickers: string[]) => void; // New prop
 }
 
 // Helper to find the most prominent signal for a ticker from allAnalysisData
@@ -56,8 +57,18 @@ export const MonitorView: React.FC<MonitorViewProps> = ({
   monitorTickerInput,
   setMonitorTickerInput,
   isLoadingAnalysis,
+  onRunAnalysis, // Destructure new prop
 }) => {
   const [feedbackMessage, setFeedbackMessage] = useState<string | null>(null);
+
+  const handleRunWatchlistAnalysis = () => {
+    if (watchlist.length > 0) {
+      onRunAnalysis(watchlist);
+    } else {
+      setFeedbackMessage("Watchlist is empty. Add tickers to run analysis.");
+      setTimeout(() => setFeedbackMessage(null), 3000);
+    }
+  };
 
   const handleAddClick = () => {
     setFeedbackMessage(null); // Clear previous message
@@ -106,6 +117,16 @@ export const MonitorView: React.FC<MonitorViewProps> = ({
         <p className={`text-sm mb-4 px-1 ${feedbackMessage.includes('added') ? 'text-green-600' : 'text-red-600'}`}>
           {feedbackMessage}
         </p>
+      )}
+
+      {watchlist.length > 0 && (
+        <button
+          onClick={handleRunWatchlistAnalysis}
+          className="mb-4 w-full bg-green-600 hover:bg-green-700 text-white font-semibold p-2 rounded-md shadow-sm disabled:opacity-50"
+          disabled={isLoadingAnalysis || watchlist.length === 0}
+        >
+          {isLoadingAnalysis ? 'Analysis Running...' : `Run Analysis for Watchlist (${watchlist.length} tickers)`}
+        </button>
       )}
 
       {watchlist.length === 0 ? (

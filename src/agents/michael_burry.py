@@ -79,7 +79,8 @@ def michael_burry_agent(state: AgentState):  # noqa: C901  (complexity is fine h
         )
 
         progress.update_status("michael_burry_agent", ticker, "Fetching insider trades")
-        insider_trades = get_insider_trades(ticker, end_date=end_date, start_date=start_date)
+        force_refresh = state.get("metadata", {}).get("force_refresh", False)
+        insider_trades = get_insider_trades(ticker, end_date=end_date, start_date=start_date, force_refresh=force_refresh)
 
         progress.update_status("michael_burry_agent", ticker, "Fetching company news")
         news = get_company_news(ticker, end_date=end_date, start_date=start_date, limit=250)
