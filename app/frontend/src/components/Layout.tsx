@@ -22,7 +22,7 @@ export function Layout({ leftSidebar, rightSidebar, children }: LayoutProps) {
         <ReactFlowProvider>
           <FlowProvider>
             {/* Main content area takes full width */}
-            <main className="flex-1 h-full overflow-hidden w-full">
+            <main className="flex-1 h-full overflow-auto w-full">
               {children}
             </main>
 
@@ -42,7 +42,7 @@ export function Layout({ leftSidebar, rightSidebar, children }: LayoutProps) {
             </div>
 
             {/* Sidebar toggle button - visible when sidebar is collapsed */}
-            {isCollapsed && (
+            {false && (
               <Button 
                 className="absolute top-4 left-4 z-30 bg-ramp-grey-800 text-white p-2 rounded-md hover:bg-ramp-grey-700"
                 onClick={() => setIsCollapsed(false)}
