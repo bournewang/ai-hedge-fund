@@ -358,7 +358,7 @@ def get_market_cap(
     
     # Check cache first - simple exact match
     if cached_data := _cache.get_market_cap(cache_key):
-        logger.info(f"Cache HIT for market_cap: {cache_key}")
+        logger.info(f"Cache HIT for market_cap: {cache_key} {cached_data}")
         return cached_data
     
     logger.info(f"Cache MISS for market_cap: {cache_key}")

@@ -144,11 +144,11 @@ export function ExplorePage() {
                 <TrendingUp className="w-5 h-5 mr-2" />
                 Real-time Data
               </Badge>
-              <Badge variant="secondary" className="px-4 py-2 text-lg">
+              {/* <Badge variant="secondary" className="px-4 py-2 text-lg">
                 <Clock className="w-5 h-5 mr-2" />
                 {lastUpdated ? `Updated ${lastUpdated.toLocaleTimeString()}` : 'Live'}
-              </Badge>
-              {selectedTickers.length > 0 && (
+              </Badge> */}
+              {/* {selectedTickers.length > 0 && (
                 <Badge variant="secondary" className="px-4 py-2 text-lg bg-white/20">
                   <BarChart className="w-5 h-5 mr-2" />
                   {selectedTickers.length} Selected
@@ -163,7 +163,7 @@ export function ExplorePage() {
               >
                 <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
                 Refresh
-              </Button>
+              </Button> */}
             </div>
           </div>
         </div>
