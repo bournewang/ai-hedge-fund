@@ -1,21 +1,13 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
 import { 
-  CheckCircle2, 
-  Clock, 
-  AlertCircle, 
-  TrendingUp, 
-  TrendingDown, 
-  Minus,
-  Download,
   BarChart3,
-  Eye,
+  Download,
   Loader2
 } from 'lucide-react';
 import { useNodeContext } from '@/contexts/node-context';
-import { agents, type AgentItem } from '@/data/agents';
+import { AnalysisProgressMatrix } from './AnalysisProgressMatrix';
+import { AnalysisResultsTable } from './AnalysisResultsTable';
 
 interface AnalysisResultsProps {
   selectedAgents: string[];
@@ -83,61 +75,6 @@ export function AnalysisResults({ selectedAgents, tickers, isAnalyzing }: Analys
 
   const stats = getAgentStats();
 
-  // 获取代理信息
-  const getAgentInfo = (agentKey: string): AgentItem | null => {
-    return agents.find(agent => agent.key === agentKey) || null;
-  };
-
-  // 获取状态颜色和图标
-  const getStatusDisplay = (status: string) => {
-    switch (status) {
-      case 'COMPLETE':
-        return {
-          icon: <CheckCircle2 className="h-4 w-4 text-green-600" />,
-          color: 'text-green-600',
-          bgColor: 'bg-green-50 border-green-200',
-          label: '已完成'
-        };
-      case 'IN_PROGRESS':
-        return {
-          icon: <Loader2 className="h-4 w-4 text-blue-600 animate-spin" />,
-          color: 'text-blue-600',
-          bgColor: 'bg-blue-50 border-blue-200',
-          label: '分析中'
-        };
-      case 'ERROR':
-        return {
-          icon: <AlertCircle className="h-4 w-4 text-red-600" />,
-          color: 'text-red-600',
-          bgColor: 'bg-red-50 border-red-200',
-          label: '错误'
-        };
-      default:
-        return {
-          icon: <Clock className="h-4 w-4 text-gray-400" />,
-          color: 'text-gray-400',
-          bgColor: 'bg-gray-50 border-gray-200',
-          label: '等待中'
-        };
-    }
-  };
-
-  // 获取投资建议图标
-  const getActionIcon = (action: string) => {
-    switch (action?.toLowerCase()) {
-      case 'buy':
-      case 'long':
-        return <TrendingUp className="h-4 w-4 text-green-600" />;
-      case 'sell':
-      case 'short':
-        return <TrendingDown className="h-4 w-4 text-red-600" />;
-      case 'hold':
-        return <Minus className="h-4 w-4 text-yellow-600" />;
-      default:
-        return <BarChart3 className="h-4 w-4 text-gray-400" />;
-    }
-  };
-
   // 导出结果
   const handleExportResults = () => {
     if (!outputNodeData) return;
@@ -154,21 +91,32 @@ export function AnalysisResults({ selectedAgents, tickers, isAnalyzing }: Analys
     URL.revokeObjectURL(url);
   };
 
+  // Convert agentNodeData to match the expected type
+  const convertedAgentNodeData = Object.fromEntries(
+    Object.entries(agentNodeData).map(([key, value]) => [
+      key,
+      {
+        ...value,
+        ticker: value.ticker || undefined
+      }
+    ])
+  );
+
   // 如果还没开始分析，不显示任何内容
   if (!isAnalyzing && !isComplete && !isProcessingResults) {
     return null;
   }
 
   return (
-    <div className="max-w-4xl mx-auto mt-8 space-y-6">
+    <div className="max-w-7xl mx-auto mt-8 space-y-6">
       {/* 总体进度卡片 */}
-      <Card>
+      <Card className="border-l-4 border-l-orange-500 dark:border-l-orange-400">
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
               <CardTitle className="flex items-center gap-2">
-                <BarChart3 className="h-5 w-5 text-blue-600" />
-                分析进度
+                <BarChart3 className="h-5 w-5 text-orange-600 dark:text-orange-400" />
+                分析进度总览
               </CardTitle>
               <CardDescription>
                 {isComplete ? '分析已完成' : 
@@ -187,31 +135,31 @@ export function AnalysisResults({ selectedAgents, tickers, isAnalyzing }: Analys
         <CardContent>
           <div className="space-y-4">
             {/* 进度条 */}
-            <div className="w-full bg-gray-100 rounded-full h-4 overflow-hidden">
+            <div className="w-full bg-gray-100 dark:bg-gray-800 rounded-full h-4 overflow-hidden">
               <div 
-                className="h-full bg-blue-600 transition-all duration-500 ease-out"
+                className="h-full bg-gradient-to-r from-orange-500 to-red-500 dark:from-orange-400 dark:to-red-400 transition-all duration-500 ease-out"
                 style={{ width: `${progress}%` }}
               />
             </div>
 
             {/* 进度统计 */}
-            <div className="flex justify-between items-center text-sm text-gray-600">
-              <span>总进度: {progress}%</span>
+            <div className="flex justify-between items-center text-sm text-gray-600 dark:text-gray-400">
+              <span className="font-medium">总进度: {progress}%</span>
               <div className="flex gap-4">
-                <span>完成: {stats.completed}</span>
-                <span>进行中: {stats.inProgress}</span>
-                <span>等待中: {stats.idle}</span>
-                {stats.error > 0 && <span className="text-red-600">错误: {stats.error}</span>}
+                <span className="text-green-600 dark:text-green-400">完成: {stats.completed}</span>
+                <span className="text-blue-600 dark:text-blue-400">进行中: {stats.inProgress}</span>
+                <span className="text-gray-500 dark:text-gray-400">等待中: {stats.idle}</span>
+                {stats.error > 0 && <span className="text-red-600 dark:text-red-400">错误: {stats.error}</span>}
               </div>
             </div>
 
             {/* Processing results hint */}
             {isProcessingResults && (
-              <div className="flex items-center justify-center gap-3 p-6 bg-blue-50 rounded-lg border border-blue-200">
-                <Loader2 className="h-5 w-5 text-blue-600 animate-spin" />
+              <div className="flex items-center justify-center gap-3 p-6 bg-orange-50 dark:bg-orange-950/30 rounded-lg border border-orange-200 dark:border-orange-800">
+                <Loader2 className="h-5 w-5 text-orange-600 dark:text-orange-400 animate-spin" />
                 <div className="text-center">
-                  <div className="font-medium text-blue-800">正在处理分析结果</div>
-                  <div className="text-sm text-blue-600">所有投资大师已完成分析，正在汇总投资建议...</div>
+                  <div className="font-medium text-orange-800 dark:text-orange-200">正在处理分析结果</div>
+                  <div className="text-sm text-orange-600 dark:text-orange-400">所有投资大师已完成分析，正在汇总投资建议...</div>
                 </div>
               </div>
             )}
@@ -219,173 +167,22 @@ export function AnalysisResults({ selectedAgents, tickers, isAnalyzing }: Analys
         </CardContent>
       </Card>
 
-      {/* 代理状态卡片 */}
+      {/* Progress Matrix - Show during analysis */}
       {isAnalyzing && !isComplete && (
-        <Card>
-          <CardHeader>
-            <CardTitle>实时进度</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {selectedAgents.map(agentKey => {
-              const agentInfo = getAgentInfo(agentKey);
-              if (!agentInfo) return null;
-
-              const agentData = agentNodeData[agentKey];
-              const status = agentData?.status || 'IDLE';
-              const statusDisplay = getStatusDisplay(status);
-
-              return (
-                <div key={agentKey} className={`${statusDisplay.bgColor} border rounded-lg p-4`}>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className={`${statusDisplay.color}`}>
-                        {statusDisplay.icon}
-                      </div>
-                      <div>
-                        <div className="font-medium">{agentInfo.display_name}</div>
-                        <div className="text-sm text-gray-600">
-                          {agentData?.message || statusDisplay.label}
-                          {agentData?.ticker && ` - ${agentData.ticker}`}
-                        </div>
-                      </div>
-                    </div>
-                    <Badge variant="outline" className={statusDisplay.color}>
-                      {statusDisplay.label}
-                    </Badge>
-                  </div>
-                </div>
-              );
-            })}
-          </CardContent>
-        </Card>
+        <AnalysisProgressMatrix
+          selectedAgents={selectedAgents}
+          tickers={tickers}
+          agentNodeData={convertedAgentNodeData}
+        />
       )}
 
-      {/* 分析结果卡片 */}
+      {/* Results Table - Show when complete */}
       {outputNodeData && (
-        <Card>
-          <CardHeader>
-            <CardTitle>分析结果</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-6">
-              {tickers.map(ticker => {
-                const agentSignals = outputNodeData.analyst_signals || {};
-                const decision = outputNodeData.decisions?.[ticker];
-                
-                // Check for any valid results including risk management
-                const hasResults = selectedAgents.some(agent => 
-                  agentSignals[agent + '_agent']?.[ticker]?.signal ||
-                  (agent === 'risk_management' && agentSignals['risk_management_agent']?.[ticker]?.remaining_position_limit !== undefined)
-                );
-
-                if (!hasResults) return null;
-
-                return (
-                  <Card key={ticker}>
-                    <CardHeader>
-                      <CardTitle className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <Eye className="h-5 w-5 text-blue-600" />
-                          {ticker} 分析结果
-                        </div>
-                        {decision && (
-                          <Badge 
-                            variant={
-                              decision.action === 'buy' ? 'success' :
-                              decision.action === 'sell' ? 'destructive' :
-                              'outline'
-                            } 
-                            className="flex items-center gap-1"
-                          >
-                            {getActionIcon(decision.action)}
-                            {decision.action.toUpperCase()}
-                            {decision.confidence && ` (${decision.confidence}%)`}
-                          </Badge>
-                        )}
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-4">
-                        {selectedAgents.map(agentKey => {
-                          const agentInfo = getAgentInfo(agentKey);
-                          if (!agentInfo) return null;
-
-                          const fullAgentKey = agentKey + '_agent';
-                          const agentResults = agentSignals[fullAgentKey]?.[ticker];
-                          
-                          // Special handling for risk management agent
-                          if (agentKey === 'risk_management' && agentResults) {
-                            return (
-                              <div key={agentKey} className="space-y-2">
-                                <div className="flex items-center justify-between">
-                                  <div className="flex items-center gap-2">
-                                    <div className="font-medium">{agentInfo.display_name}</div>
-                                    <Badge variant="secondary" className="text-xs">
-                                      {agentInfo.category_name}
-                                    </Badge>
-                                  </div>
-                                </div>
-                                <div className="text-sm text-gray-600 space-y-1">
-                                  <div>可用仓位: {agentResults.remaining_position_limit?.toLocaleString()} USD</div>
-                                  <div>当前价格: {agentResults.current_price?.toLocaleString()} USD</div>
-                                  {agentResults.reasoning && (
-                                    <>
-                                      <div>可用现金: {agentResults.reasoning.available_cash?.toLocaleString()} USD</div>
-                                      <div>当前持仓: {agentResults.reasoning.current_position_value?.toLocaleString()} USD</div>
-                                      <div>仓位限制: {agentResults.reasoning.position_limit?.toLocaleString()} USD</div>
-                                    </>
-                                  )}
-                                </div>
-                                <Separator />
-                              </div>
-                            );
-                          }
-
-                          // Regular agent handling
-                          if (!agentResults?.signal) return null;
-
-                          return (
-                            <div key={agentKey} className="space-y-2">
-                              <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-2">
-                                  <div className="font-medium">{agentInfo.display_name}</div>
-                                  <Badge variant="secondary" className="text-xs">
-                                    {agentInfo.category_name}
-                                  </Badge>
-                                </div>
-                                <Badge 
-                                  variant={
-                                    agentResults.signal.toLowerCase() === 'buy' ? 'success' :
-                                    agentResults.signal.toLowerCase() === 'sell' ? 'destructive' :
-                                    'outline'
-                                  } 
-                                  className="flex items-center gap-1"
-                                >
-                                  {getActionIcon(agentResults.signal)}
-                                  {agentResults.signal.toUpperCase()}
-                                </Badge>
-                              </div>
-                              {agentResults.confidence && (
-                                <div className="flex items-center gap-2 text-sm text-gray-600">
-                                  <span>置信度:</span>
-                                  <Badge variant="outline">
-                                    {Math.round(agentResults.confidence)}%
-                                  </Badge>
-                                </div>
-                              )}
-                              <p className="text-sm text-gray-600">{agentResults.reasoning}</p>
-                              <Separator />
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </CardContent>
-                  </Card>
-                );
-              })}
-            </div>
-          </CardContent>
-        </Card>
+        <AnalysisResultsTable
+          selectedAgents={selectedAgents}
+          tickers={tickers}
+          outputNodeData={outputNodeData}
+        />
       )}
     </div>
   );

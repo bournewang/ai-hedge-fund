@@ -1,10 +1,31 @@
 """Helper functions for LLM"""
 
 import json
+import hashlib
+import logging
 from pydantic import BaseModel
 from src.llm.models import get_model, get_model_info
 from src.utils.progress import progress
 from src.graph.state import AgentState
+from src.data.cache import get_cache
+
+# Set up logging for LLM cache performance
+logger = logging.getLogger(__name__)
+
+# Global cache instance
+_cache = get_cache()
+
+
+def _create_llm_cache_key(prompt: any, model_name: str, model_provider: str, pydantic_model_name: str) -> str:
+    """Create a cache key for LLM requests."""
+    # Convert prompt to string if it's not already
+    prompt_str = str(prompt)
+    
+    # Create a hash of the key components
+    key_components = f"{prompt_str}_{model_name}_{model_provider}_{pydantic_model_name}"
+    cache_key = hashlib.md5(key_components.encode()).hexdigest()
+    
+    return cache_key
 
 
 def call_llm(
@@ -31,6 +52,8 @@ def call_llm(
     """
     
     # Extract model configuration if state is provided and agent_name is available
+    model_name = None
+    model_provider = None
     if state and agent_name:
         model_name, model_provider = get_agent_model_config(state, agent_name)
     
@@ -39,6 +62,16 @@ def call_llm(
         model_name = "gpt-4o"
     if not model_provider:
         model_provider = "OPENAI"
+
+    # Create cache key
+    cache_key = _create_llm_cache_key(prompt, model_name, model_provider, pydantic_model.__name__)
+    
+    # Check cache first
+    if cached_response := _cache.get_llm_response(cache_key):
+        logger.info(f"Cache HIT for LLM: {pydantic_model.__name__} ({agent_name or 'unknown'})")
+        return pydantic_model(**cached_response)
+    
+    logger.info(f"Cache MISS for LLM: {pydantic_model.__name__} ({agent_name or 'unknown'})")
 
     model_info = get_model_info(model_name, model_provider)
     llm = get_model(model_name, model_provider)
@@ -60,8 +93,15 @@ def call_llm(
             if model_info and not model_info.has_json_mode():
                 parsed_result = extract_json_from_response(result.content)
                 if parsed_result:
-                    return pydantic_model(**parsed_result)
+                    final_result = pydantic_model(**parsed_result)
+                    # Cache the successful result
+                    _cache.set_llm_response(cache_key, final_result.model_dump())
+                    logger.info(f"Cached LLM response: {pydantic_model.__name__} ({agent_name or 'unknown'})")
+                    return final_result
             else:
+                # Cache the successful result
+                _cache.set_llm_response(cache_key, result.model_dump())
+                logger.info(f"Cached LLM response: {pydantic_model.__name__} ({agent_name or 'unknown'})")
                 return result
 
         except Exception as e:

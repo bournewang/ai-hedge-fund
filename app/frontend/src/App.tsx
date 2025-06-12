@@ -9,6 +9,7 @@ import { ValuePicksPage } from './components/ValuePicksPage';
 import { Layout } from './components/Layout';
 import { Button } from './components/ui/button';
 import { Users, TrendingUp, Eye, Gem, Home, BarChart3 } from 'lucide-react';
+import { ThemeToggle } from './components/ui/theme-toggle';
 
 function Navigation() {
   const location = useLocation();
@@ -23,10 +24,10 @@ function Navigation() {
   ];
 
   return (
-    <div className="bg-white border-b">
+    <div className="bg-background border-b">
       <div className="max-w-6xl mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
-          <Link to="/" className="text-xl font-bold text-blue-600">AI Hedge Fund</Link>
+          <Link to="/" className="text-xl font-bold text-primary">AI Hedge Fund</Link>
           <div className="flex items-center gap-2">
             {navItems.map((item) => {
               const Icon = item.icon;
@@ -34,8 +35,8 @@ function Navigation() {
               return (
                 <Link key={item.path} to={item.path}>
                   <Button 
-                    variant={isActive ? "default" : "ghost"} 
-                    className="flex items-center gap-2"
+                    variant={isActive ? "secondary" : "ghost"} 
+                    className="flex items-center gap-2 text-foreground hover:text-foreground"
                   >
                     <Icon className="h-4 w-4" />
                     {item.label}
@@ -44,6 +45,8 @@ function Navigation() {
               );
             })}
           </div>
+
+          <ThemeToggle/>
         </div>
       </div>
     </div>

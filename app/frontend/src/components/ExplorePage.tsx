@@ -128,18 +128,18 @@ export function ExplorePage() {
   const getTrendingIcon = (trending: string) => {
     switch (trending) {
       case 'hot':
-        return <Flame className="w-4 h-4 text-red-500" />;
+        return <Flame className="w-4 h-4 text-red-500 dark:text-red-400" />;
       case 'strong':
-        return <Zap className="w-4 h-4 text-yellow-500" />;
+        return <Zap className="w-4 h-4 text-yellow-500 dark:text-yellow-400" />;
       case 'rising':
-        return <BarChart3 className="w-4 h-4 text-green-500" />;
+        return <BarChart3 className="w-4 h-4 text-green-500 dark:text-green-400" />;
       default:
-        return <TrendingUp className="w-4 h-4 text-blue-500" />;
+        return <TrendingUp className="w-4 h-4 text-blue-500 dark:text-blue-400" />;
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       {/* Hero Section */}
       <div className="bg-gradient-to-br from-green-600 to-blue-700 text-white py-12">
         <div className="max-w-6xl mx-auto px-4">
@@ -191,7 +191,7 @@ export function ExplorePage() {
           {filteredStocks.map((stock) => (
             <Card
               key={stock.ticker}
-              className="group hover:shadow-lg transition-all duration-300 overflow-hidden border-l-4 border-l-green-500"
+              className="group hover:shadow-lg transition-all duration-300 overflow-hidden border-l-4 border-l-green-500 dark:border-l-green-400"
             >
               <CardHeader className="pb-3">
                 <div className="flex items-start justify-between">
@@ -200,14 +200,14 @@ export function ExplorePage() {
                       {stock.ticker}
                       {getTrendingIcon(stock.trending)}
                     </CardTitle>
-                    <CardDescription className="text-gray-600 font-medium">
+                    <CardDescription className="text-muted-foreground font-medium">
                       {stock.company}
                     </CardDescription>
                   </div>
                   <div className="text-right">
-                    <div className="text-xl font-bold">${stock.price}</div>
+                    <div className="text-xl font-bold text-foreground">${stock.price}</div>
                     <div className={`text-sm font-medium ${
-                      stock.change >= 0 ? 'text-green-600' : 'text-red-600'
+                      stock.change >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
                     }`}>
                       {stock.change >= 0 ? '+' : ''}{stock.change} ({stock.changePercent}%)
                     </div>
@@ -220,11 +220,11 @@ export function ExplorePage() {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     {stock.signalStrength >= 4 ? (
-                      <Badge className="bg-green-600 hover:bg-green-700 text-white font-semibold">
+                      <Badge className="bg-green-600 dark:bg-green-500 hover:bg-green-700 dark:hover:bg-green-600 text-white font-semibold">
                         STRONG BUY
                       </Badge>
                     ) : stock.signalStrength >= 3 ? (
-                      <Badge className="bg-blue-600 hover:bg-blue-700 text-white font-semibold">
+                      <Badge className="bg-blue-600 dark:bg-blue-500 hover:bg-blue-700 dark:hover:bg-blue-600 text-white font-semibold">
                         BUY
                       </Badge>
                     ) : (
@@ -232,17 +232,17 @@ export function ExplorePage() {
                         WATCH
                       </Badge>
                     )}
-                    <span className="text-xs text-gray-500">
+                    <span className="text-xs text-muted-foreground">
                       {stock.signals.length} analyst{stock.signals.length > 1 ? 's' : ''}
                     </span>
                   </div>
-                  <div className="text-xs text-gray-500">
+                  <div className="text-xs text-muted-foreground">
                     {stock.timeframe} ago
                   </div>
                 </div>
 
                 {/* Top Catalyst */}
-                <div className="text-xs text-gray-600 flex items-start gap-1">
+                <div className="text-xs text-muted-foreground flex items-start gap-1">
                   <ChevronRight className="w-3 h-3 mt-0.5 shrink-0" />
                   <span className="line-clamp-2">{stock.catalysts[0]}</span>
                 </div>
@@ -260,9 +260,9 @@ export function ExplorePage() {
         {/* Empty State */}
         {filteredStocks.length === 0 && (
           <div className="text-center py-12">
-            <TrendingUp className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-gray-600 mb-2">No trending stocks found</h3>
-            <p className="text-gray-500">Try adjusting your search criteria or filters</p>
+            <TrendingUp className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+            <h3 className="text-xl font-semibold text-foreground mb-2">No trending stocks found</h3>
+            <p className="text-muted-foreground">Try adjusting your search criteria or filters</p>
           </div>
         )}
       </div>
