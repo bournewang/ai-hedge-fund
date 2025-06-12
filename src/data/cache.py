@@ -1,5 +1,5 @@
 import diskcache as dc
-from typing import Dict, List, Any, Optional
+from typing import Dict, List, Any, Optional, Union
 
 
 class Cache:
@@ -10,7 +10,7 @@ class Cache:
         self._cache = dc.Cache(cache_dir)
         print(f"📁 Initialized persistent cache at: {cache_dir}")
 
-    def _merge_data(self, existing: list[dict] | None, new_data: list[dict], key_field: str) -> list[dict]:
+    def _merge_data(self, existing: Optional[List[Dict]], new_data: List[Dict], key_field: str) -> List[Dict]:
         """Merge existing and new data, avoiding duplicates based on a key field."""
         if not existing:
             return new_data
@@ -24,62 +24,62 @@ class Cache:
         return merged
 
     # Prices cache methods
-    def get_prices(self, cache_key: str) -> list[dict[str, any]] | None:
+    def get_prices(self, cache_key: str) -> Optional[List[Dict[str, Any]]]:
         """Get cached price data if available."""
         return self._cache.get(f"prices:{cache_key}")
 
-    def set_prices(self, cache_key: str, data: list[dict[str, any]]):
+    def set_prices(self, cache_key: str, data: List[Dict[str, Any]]):
         """Cache price data."""
         existing = self.get_prices(cache_key)
         merged_data = self._merge_data(existing, data, key_field="time")
         self._cache.set(f"prices:{cache_key}", merged_data)
 
     # Financial metrics cache methods
-    def get_financial_metrics(self, cache_key: str) -> list[dict[str, any]] | None:
+    def get_financial_metrics(self, cache_key: str) -> Optional[List[Dict[str, Any]]]:
         """Get cached financial metrics if available."""
         return self._cache.get(f"financial_metrics:{cache_key}")
 
-    def set_financial_metrics(self, cache_key: str, data: list[dict[str, any]]):
+    def set_financial_metrics(self, cache_key: str, data: List[Dict[str, Any]]):
         """Cache financial metrics data."""
         existing = self.get_financial_metrics(cache_key)
         merged_data = self._merge_data(existing, data, key_field="report_period")
         self._cache.set(f"financial_metrics:{cache_key}", merged_data)
 
     # Line items cache methods
-    def get_line_items(self, cache_key: str) -> list[dict[str, any]] | None:
+    def get_line_items(self, cache_key: str) -> Optional[List[Dict[str, Any]]]:
         """Get cached line items if available."""
         return self._cache.get(f"line_items:{cache_key}")
 
-    def set_line_items(self, cache_key: str, data: list[dict[str, any]]):
+    def set_line_items(self, cache_key: str, data: List[Dict[str, Any]]):
         """Cache line items data."""
         existing = self.get_line_items(cache_key)
         merged_data = self._merge_data(existing, data, key_field="report_period")
         self._cache.set(f"line_items:{cache_key}", merged_data)
 
     # Insider trades cache methods
-    def get_insider_trades(self, cache_key: str) -> list[dict[str, any]] | None:
+    def get_insider_trades(self, cache_key: str) -> Optional[List[Dict[str, Any]]]:
         """Get cached insider trades if available."""
         return self._cache.get(f"insider_trades:{cache_key}")
 
-    def set_insider_trades(self, cache_key: str, data: list[dict[str, any]]):
+    def set_insider_trades(self, cache_key: str, data: List[Dict[str, Any]]):
         """Cache insider trades data."""
         existing = self.get_insider_trades(cache_key)
         merged_data = self._merge_data(existing, data, key_field="filing_date")
         self._cache.set(f"insider_trades:{cache_key}", merged_data)
 
     # Company news cache methods
-    def get_company_news(self, cache_key: str) -> list[dict[str, any]] | None:
+    def get_company_news(self, cache_key: str) -> Optional[List[Dict[str, Any]]]:
         """Get cached company news if available."""
         return self._cache.get(f"company_news:{cache_key}")
 
-    def set_company_news(self, cache_key: str, data: list[dict[str, any]]):
+    def set_company_news(self, cache_key: str, data: List[Dict[str, Any]]):
         """Cache company news data."""
         existing = self.get_company_news(cache_key)
         merged_data = self._merge_data(existing, data, key_field="date")
         self._cache.set(f"company_news:{cache_key}", merged_data)
 
     # Market cap cache methods
-    def get_market_cap(self, cache_key: str) -> float | None:
+    def get_market_cap(self, cache_key: str) -> Optional[float]:
         """Get cached market cap if available."""
         return self._cache.get(f"market_cap:{cache_key}")
 
@@ -88,16 +88,26 @@ class Cache:
         self._cache.set(f"market_cap:{cache_key}", market_cap)
 
     # LLM response cache methods
-    def get_llm_response(self, cache_key: str) -> dict[str, any] | None:
+    def get_llm_response(self, cache_key: str) -> Optional[Dict[str, Any]]:
         """Get cached LLM response if available."""
         return self._cache.get(f"llm:{cache_key}")
 
-    def set_llm_response(self, cache_key: str, response_data: dict[str, any]):
+    def set_llm_response(self, cache_key: str, response_data: Dict[str, Any]):
         """Cache LLM response data."""
         self._cache.set(f"llm:{cache_key}", response_data)
 
+    # Trending stocks cache methods
+    def get_trending_stocks(self, cache_key: str) -> Optional[List[Dict[str, Any]]]:
+        """Get cached trending stocks data if available."""
+        return self._cache.get(f"trending:{cache_key}")
+
+    def set_trending_stocks(self, cache_key: str, data: List[Dict[str, Any]]):
+        """Cache trending stocks data."""
+        # Set with TTL of 5 minutes (300 seconds) since market data changes frequently
+        self._cache.set(f"trending:{cache_key}", data, expire=300)
+
     # Cache management methods
-    def get_cache_stats(self) -> dict[str, int]:
+    def get_cache_stats(self) -> Dict[str, int]:
         """Get cache statistics for monitoring performance."""
         # Count entries by prefix
         stats = {
@@ -108,6 +118,7 @@ class Cache:
             "company_news_cached": 0,
             "market_cap_cached": 0,
             "llm_responses_cached": 0,
+            "trending_stocks_cached": 0,
             "total_cache_entries": len(self._cache)
         }
         
@@ -127,6 +138,8 @@ class Cache:
                 stats["market_cap_cached"] += 1
             elif key.startswith("llm:"):
                 stats["llm_responses_cached"] += 1
+            elif key.startswith("trending:"):
+                stats["trending_stocks_cached"] += 1
         
         return stats
 
@@ -157,7 +170,7 @@ class Cache:
         self._cache = dc.Cache(self._cache.directory)
         print("💾 Cache synced to disk")
 
-    def get_cache_size(self) -> dict[str, any]:
+    def get_cache_size(self) -> Dict[str, Any]:
         """Get cache size information."""
         return {
             "total_entries": len(self._cache),

@@ -71,7 +71,7 @@ def get_cache_monitor_data():
                 "hit_rate": perf_stats['hit_rates'].get(cache_type, 0),
                 "total_requests": perf_stats['total_requests'].get(cache_type, 0)
             }
-            for cache_type in ["prices", "financial_metrics", "line_items", "insider_trades", "company_news", "market_cap", "llm_responses"]
+            for cache_type in ["prices", "financial_metrics", "line_items", "insider_trades", "company_news", "market_cap", "llm_responses", "trending_stocks"]
         },
         "cache_directory": cache.get_cache_size()['cache_directory'] if hasattr(cache, 'get_cache_size') else None
     } 

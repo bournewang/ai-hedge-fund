@@ -46,7 +46,7 @@ class CacheMonitor:
         total_hits = 0
         total_requests = 0
         
-        for cache_type in ["prices", "financial_metrics", "line_items", "insider_trades", "company_news", "market_cap"]:
+        for cache_type in ["prices", "financial_metrics", "line_items", "insider_trades", "company_news", "market_cap", "trending_stocks"]:
             hits = self.hit_counts.get(cache_type, 0)
             misses = self.miss_counts.get(cache_type, 0)
             total = hits + misses

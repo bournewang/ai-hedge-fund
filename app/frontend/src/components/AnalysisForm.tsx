@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect, useMemo } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -36,11 +37,31 @@ const validateTicker = (ticker: string): boolean => {
 };
 
 export function AnalysisForm({ onAnalysisStart }: AnalysisFormProps) {
+  const [searchParams] = useSearchParams();
   const [tickers, setTickers] = useState<string>('AAPL,MSFT,NVDA');
   const [selectedStyle, setSelectedStyle] = useState<InvestmentStyle | 'all'>('all');
   const [selectedAgents, setSelectedAgents] = useState<string[]>([]);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const nodeContext = useNodeContext();
+
+  // Parse tickers from URL parameters on component mount
+  useEffect(() => {
+    const urlTickers = searchParams.get('tickers');
+    if (urlTickers) {
+      // Decode and clean up the tickers
+      const decodedTickers = decodeURIComponent(urlTickers);
+      const cleanedTickers = decodedTickers
+        .split(',')
+        .map(ticker => ticker.trim().toUpperCase())
+        .filter(ticker => ticker.length > 0)
+        .join(',');
+      
+      if (cleanedTickers) {
+        setTickers(cleanedTickers);
+        console.log('✅ Loaded tickers from URL:', cleanedTickers);
+      }
+    }
+  }, [searchParams]);
 
   // 验证股票代码
   const tickerValidation = useMemo(() => {
@@ -208,6 +229,16 @@ export function AnalysisForm({ onAnalysisStart }: AnalysisFormProps) {
                     }`}
                   />
                   
+                  {/* URL Tickers Loaded Indicator */}
+                  {searchParams.get('tickers') && (
+                    <div className="flex items-center gap-2 p-3 border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-950/30 rounded-lg">
+                      <TrendingUp className="h-4 w-4 text-blue-600 dark:text-blue-400 flex-shrink-0" />
+                      <div className="text-sm text-blue-700 dark:text-blue-300">
+                        <span className="font-medium">从趋势页面载入:</span> 已自动填入选中的热门股票
+                      </div>
+                    </div>
+                  )}
+
                   {/* 验证提示 */}
                   {!tickerValidation.isEmpty && !tickerValidation.isValid && (
                     <div className="flex items-center gap-2 p-3 border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-950/30 rounded-lg">

@@ -19,6 +19,32 @@ interface HedgeFundRequest {
   margin_requirement?: number;
 }
 
+// Types for explore functionality
+export interface TrendingStock {
+  symbol: string;
+  company_name: string;
+  price: number;
+  change: number;
+  change_percent: number;
+  volume: number;
+  market_cap: number;
+  market_cap_formatted: string;
+  sector: string | null;
+  exchange: string;
+  fifty_two_week_high?: number;
+  fifty_two_week_low?: number;
+  pe_ratio?: number;
+  book_value?: number;
+}
+
+export interface ExploreData {
+  gainers: TrendingStock[];
+  losers: TrendingStock[];
+  timestamp: string;
+  total_gainers: number;
+  total_losers: number;
+}
+
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
 export const api = {
@@ -175,5 +201,45 @@ export const api = {
     return () => {
       controller.abort();
     };
+  },
+
+  /**
+   * Fetch trending stocks data (both gainers and losers)
+   */
+  getTrendingStocks: async (): Promise<ExploreData> => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/explore/trending`);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const result = await response.json();
+      if (!result.success) {
+        throw new Error('Failed to fetch trending stocks');
+      }
+      return result.data;
+    } catch (error) {
+      console.error('Error fetching trending stocks:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Fetch day gainers only
+   */
+  getDayGainers: async (count: number = 10): Promise<TrendingStock[]> => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/explore/gainers?count=${count}`);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const result = await response.json();
+      if (!result.success) {
+        throw new Error('Failed to fetch day gainers');
+      }
+      return result.data.gainers;
+    } catch (error) {
+      console.error('Error fetching day gainers:', error);
+      throw error;
+    }
   },
 }; 
