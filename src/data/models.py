@@ -73,7 +73,88 @@ class LineItem(BaseModel):
     report_period: str
     period: str
     currency: str
-
+    
+    # Common financial statement line items that agents expect
+    # Revenue items
+    revenues: Optional[float] = None
+    revenue: Optional[float] = None
+    
+    # Profitability items
+    gross_profit: Optional[float] = None
+    operating_income: Optional[float] = None
+    operating_income_loss: Optional[float] = None
+    net_income: Optional[float] = None
+    net_income_loss: Optional[float] = None
+    
+    # Margin ratios
+    operating_margin: Optional[float] = None
+    gross_margin: Optional[float] = None
+    net_margin: Optional[float] = None
+    
+    # Cash flow items
+    free_cash_flow: Optional[float] = None
+    net_cash_flow_from_operating_activities: Optional[float] = None
+    operating_cash_flow: Optional[float] = None
+    
+    # Balance sheet items
+    assets: Optional[float] = None
+    total_assets: Optional[float] = None
+    current_assets: Optional[float] = None
+    liabilities: Optional[float] = None
+    total_liabilities: Optional[float] = None
+    current_liabilities: Optional[float] = None
+    stockholders_equity: Optional[float] = None
+    equity: Optional[float] = None
+    working_capital: Optional[float] = None
+    total_debt: Optional[float] = None
+    
+    # Investment items
+    capital_expenditures: Optional[float] = None
+    capital_expenditure: Optional[float] = None
+    research_and_development_expenses: Optional[float] = None
+    research_and_development: Optional[float] = None
+    depreciation_and_amortization: Optional[float] = None
+    
+    # Asset items
+    intangible_assets: Optional[float] = None
+    goodwill: Optional[float] = None
+    goodwill_and_intangible_assets: Optional[float] = None
+    cash_and_cash_equivalents: Optional[float] = None
+    cash_and_equivalents: Optional[float] = None
+    inventory: Optional[float] = None
+    accounts_receivable: Optional[float] = None
+    accounts_payable: Optional[float] = None
+    
+    # Debt items
+    long_term_debt: Optional[float] = None
+    short_term_debt: Optional[float] = None
+    
+    # Equity items
+    shareholders_equity: Optional[float] = None
+    retained_earnings: Optional[float] = None
+    common_stock_shares_outstanding: Optional[float] = None
+    outstanding_shares: Optional[float] = None
+    
+    # Expense items
+    operating_expenses: Optional[float] = None
+    operating_expense: Optional[float] = None
+    selling_general_and_administrative_expenses: Optional[float] = None
+    interest_expense: Optional[float] = None
+    income_tax_expense: Optional[float] = None
+    
+    # Distribution items  
+    dividends_paid: Optional[float] = None
+    dividends_and_other_cash_distributions: Optional[float] = None
+    
+    # Per share items
+    earnings_per_share: Optional[float] = None
+    basic_earnings_per_share: Optional[float] = None
+    diluted_earnings_per_share: Optional[float] = None
+    
+    # Financial ratios and derived metrics
+    return_on_invested_capital: Optional[float] = None
+    debt_to_equity: Optional[float] = None
+    
     # Allow additional fields dynamically
     model_config = {"extra": "allow"}
 

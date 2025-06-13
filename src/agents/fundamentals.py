@@ -3,7 +3,7 @@ from src.graph.state import AgentState, show_agent_reasoning
 from src.utils.progress import progress
 import json
 
-from src.tools.hybrid_api import get_financial_metrics
+from src.tools.hybrid_api_v2 import get_financial_metrics
 
 
 ##### Fundamental Agent #####

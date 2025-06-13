@@ -16,6 +16,14 @@ import logging
 import time
 from typing import List, Optional, Union
 
+# Load environment variables from .env file
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+    _ENV_LOADED = True
+except ImportError:
+    _ENV_LOADED = False
+
 from src.data.models import (
     CompanyNews,
     FinancialMetrics,
@@ -24,7 +32,7 @@ from src.data.models import (
     InsiderTrade,
 )
 
-# Import both API modules
+# Import all API modules
 try:
     from src.tools.api import (
         get_prices as get_prices_fd,
@@ -51,6 +59,21 @@ try:
 except ImportError:
     YAHOO_FINANCE_AVAILABLE = False
 
+try:
+    from src.tools.polygon_data import (
+        get_prices_polygon,
+        get_historical_prices_polygon,
+        get_financial_metrics_polygon,
+        search_line_items_polygon,
+        get_market_cap_polygon,
+        get_company_news_polygon,
+        get_insider_trades_polygon,
+        is_polygon_available,
+    )
+    POLYGON_AVAILABLE = is_polygon_available()
+except ImportError:
+    POLYGON_AVAILABLE = False
+
 # Set up logging
 logger = logging.getLogger(__name__)
 
@@ -60,8 +83,11 @@ USE_FALLBACK = True  # Enable automatic fallback
 LOG_PERFORMANCE = True  # Log performance comparisons
 
 def get_data_source() -> str:
-    """Get the current data source from environment variable."""
-    return os.environ.get("DATA_SOURCE", DEFAULT_DATA_SOURCE).lower()
+    """Get the current data source from .env file or environment variable."""
+    # .env file is already loaded at module import time
+    data_source = os.environ.get("DATA_SOURCE", DEFAULT_DATA_SOURCE).lower()
+    logger.info(f"🎯 CURRENT DATA_SOURCE: {data_source.upper()}")
+    return data_source
 
 def should_use_yahoo() -> bool:
     """Determine if we should use Yahoo Finance as primary source."""
@@ -73,6 +99,11 @@ def should_use_financial_datasets() -> bool:
     source = get_data_source()
     return source in ["financial_datasets", "fd", "premium"]
 
+def should_use_polygon() -> bool:
+    """Determine if we should use Polygon.io as primary source."""
+    source = get_data_source()
+    return source in ["polygon", "polygon.io", "poly"]
+
 def log_performance(func_name: str, source: str, duration: float, success: bool, data_count: int = 0):
     """Log performance metrics for data source comparisons."""
     if LOG_PERFORMANCE:
@@ -82,10 +113,41 @@ def log_performance(func_name: str, source: str, duration: float, success: bool,
 
 def get_prices(ticker: str, start_date: str, end_date: str) -> List[Price]:
     """Fetch price data with automatic source selection and fallback."""
-    primary_source = "yahoo" if should_use_yahoo() else "financial_datasets"
+    if should_use_polygon():
+        primary_source = "polygon"
+    elif should_use_yahoo():
+        primary_source = "yahoo"
+    else:
+        primary_source = "financial_datasets"
     
     # Try primary source
-    if primary_source == "yahoo" and YAHOO_FINANCE_AVAILABLE:
+    if primary_source == "polygon" and POLYGON_AVAILABLE:
+        start_time = time.time()
+        try:
+            result = get_prices_polygon(ticker, start_date, end_date)
+            duration = time.time() - start_time
+            log_performance("get_prices", "polygon", duration, True, len(result))
+            return result
+        except Exception as e:
+            duration = time.time() - start_time
+            log_performance("get_prices", "polygon", duration, False)
+            logger.warning(f"Polygon.io prices failed for {ticker}: {e}")
+            
+            # Fallback to Yahoo Finance if enabled
+            if USE_FALLBACK and YAHOO_FINANCE_AVAILABLE:
+                logger.info(f"Falling back to Yahoo Finance for prices: {ticker}")
+                start_time = time.time()
+                try:
+                    result = get_prices_yahoo(ticker, start_date, end_date)
+                    duration = time.time() - start_time
+                    log_performance("get_prices", "yahoo", duration, True, len(result))
+                    return result
+                except Exception as e2:
+                    duration = time.time() - start_time
+                    log_performance("get_prices", "yahoo", duration, False)
+                    logger.error(f"Both Polygon and Yahoo failed for prices {ticker}: Polygon={e}, Yahoo={e2}")
+            
+    elif primary_source == "yahoo" and YAHOO_FINANCE_AVAILABLE:
         start_time = time.time()
         try:
             result = get_prices_yahoo(ticker, start_date, end_date)
@@ -147,10 +209,41 @@ def get_financial_metrics(
     limit: int = 10,
 ) -> List[FinancialMetrics]:
     """Fetch financial metrics with automatic source selection and fallback."""
-    primary_source = "yahoo" if should_use_yahoo() else "financial_datasets"
+    if should_use_polygon():
+        primary_source = "polygon"
+    elif should_use_yahoo():
+        primary_source = "yahoo"
+    else:
+        primary_source = "financial_datasets"
     
     # Try primary source
-    if primary_source == "yahoo" and YAHOO_FINANCE_AVAILABLE:
+    if primary_source == "polygon" and POLYGON_AVAILABLE:
+        start_time = time.time()
+        try:
+            result = get_financial_metrics_polygon(ticker, end_date, period, limit)
+            duration = time.time() - start_time
+            log_performance("get_financial_metrics", "polygon", duration, True, len(result))
+            return result
+        except Exception as e:
+            duration = time.time() - start_time
+            log_performance("get_financial_metrics", "polygon", duration, False)
+            logger.warning(f"Polygon.io metrics failed for {ticker}: {e}")
+            
+            # Fallback to Yahoo Finance if enabled
+            if USE_FALLBACK and YAHOO_FINANCE_AVAILABLE:
+                logger.info(f"Falling back to Yahoo Finance for metrics: {ticker}")
+                start_time = time.time()
+                try:
+                    result = get_financial_metrics_yahoo(ticker, end_date, period, limit)
+                    duration = time.time() - start_time
+                    log_performance("get_financial_metrics", "yahoo", duration, True, len(result))
+                    return result
+                except Exception as e2:
+                    duration = time.time() - start_time
+                    log_performance("get_financial_metrics", "yahoo", duration, False)
+                    logger.error(f"Both Polygon and Yahoo failed for metrics {ticker}: Polygon={e}, Yahoo={e2}")
+            
+    elif primary_source == "yahoo" and YAHOO_FINANCE_AVAILABLE:
         start_time = time.time()
         try:
             result = get_financial_metrics_yahoo(ticker, end_date, period, limit)
@@ -237,7 +330,12 @@ def search_line_items(
     limit: int = 10,
 ) -> List[LineItem]:
     """Fetch line items with automatic source selection and fallback."""
-    primary_source = "yahoo" if should_use_yahoo() else "financial_datasets"
+    if should_use_polygon():
+        primary_source = "polygon"
+    elif should_use_yahoo():
+        primary_source = "yahoo"
+    else:
+        primary_source = "financial_datasets"
     
     # Try primary source
     if primary_source == "yahoo" and YAHOO_FINANCE_AVAILABLE:
@@ -297,10 +395,41 @@ def search_line_items(
 
 def get_market_cap(ticker: str, end_date: str) -> Optional[float]:
     """Fetch market cap with automatic source selection and fallback."""
-    primary_source = "yahoo" if should_use_yahoo() else "financial_datasets"
+    if should_use_polygon():
+        primary_source = "polygon"
+    elif should_use_yahoo():
+        primary_source = "yahoo"
+    else:
+        primary_source = "financial_datasets"
     
     # Try primary source
-    if primary_source == "yahoo" and YAHOO_FINANCE_AVAILABLE:
+    if primary_source == "polygon" and POLYGON_AVAILABLE:
+        start_time = time.time()
+        try:
+            result = get_market_cap_polygon(ticker, end_date)
+            duration = time.time() - start_time
+            log_performance("get_market_cap", "polygon", duration, result is not None)
+            return result
+        except Exception as e:
+            duration = time.time() - start_time
+            log_performance("get_market_cap", "polygon", duration, False)
+            logger.warning(f"Polygon.io market cap failed for {ticker}: {e}")
+            
+            # Fallback to Yahoo Finance if enabled
+            if USE_FALLBACK and YAHOO_FINANCE_AVAILABLE:
+                logger.info(f"Falling back to Yahoo Finance for market cap: {ticker}")
+                start_time = time.time()
+                try:
+                    result = get_market_cap_yahoo(ticker, end_date)
+                    duration = time.time() - start_time
+                    log_performance("get_market_cap", "yahoo", duration, result is not None)
+                    return result
+                except Exception as e2:
+                    duration = time.time() - start_time
+                    log_performance("get_market_cap", "yahoo", duration, False)
+                    logger.error(f"Both Polygon and Yahoo failed for market cap {ticker}: Polygon={e}, Yahoo={e2}")
+            
+    elif primary_source == "yahoo" and YAHOO_FINANCE_AVAILABLE:
         start_time = time.time()
         try:
             result = get_market_cap_yahoo(ticker, end_date)
@@ -511,11 +640,22 @@ def get_insider_trades(
 
 # Utility functions for migration monitoring
 def get_api_status() -> dict:
-    """Get status of both APIs for monitoring."""
+    """Get status of all APIs for monitoring."""
     return {
-        "financial_datasets_available": FINANCIAL_DATASETS_AVAILABLE,
-        "yahoo_finance_available": YAHOO_FINANCE_AVAILABLE,
+        "financial_datasets": {
+            "available": FINANCIAL_DATASETS_AVAILABLE,
+            "configured": True,  # Assuming it's configured if imported
+        },
+        "yahoo_finance": {
+            "available": YAHOO_FINANCE_AVAILABLE,
+            "configured": True,  # Always available via yfinance package
+        },
+        "polygon": {
+            "available": POLYGON_AVAILABLE,
+            "configured": POLYGON_AVAILABLE,  # Only true if API key is configured
+        },
         "current_source": get_data_source(),
+        "supported_sources": ["yahoo", "yfinance", "free", "financial_datasets", "fd", "premium", "polygon", "polygon.io", "poly"],
         "fallback_enabled": USE_FALLBACK,
         "performance_logging": LOG_PERFORMANCE,
     }
@@ -524,12 +664,27 @@ def get_api_status() -> dict:
 def log_migration_status():
     """Log current migration status for monitoring."""
     status = get_api_status()
+    current_source = status["current_source"]
+    
+    # Log where DATA_SOURCE was loaded from
+    env_source = ".env file" if _ENV_LOADED else "environment variable"
+    logger.info(f"🎯 CURRENT DATA_SOURCE: {current_source.upper()} (loaded from {env_source})")
     logger.info(f"API Migration Status: {status}")
     
-    if status["current_source"] == "yahoo" and not status["yahoo_finance_available"]:
+    # Check if current source is available
+    if current_source in ["yahoo", "yfinance", "free"] and not status["yahoo_finance"]["available"]:
         logger.warning("Yahoo Finance is configured as primary but not available!")
+    elif current_source in ["financial_datasets", "fd", "premium"] and not status["financial_datasets"]["available"]:
+        logger.warning("Financial Datasets is configured as primary but not available!")
+    elif current_source in ["polygon", "polygon.io", "poly"] and not status["polygon"]["available"]:
+        logger.warning("Polygon.io is configured as primary but not available!")
     
-    if not status["financial_datasets_available"] and not status["yahoo_finance_available"]:
+    # Check if any data source is available
+    any_available = (status["financial_datasets"]["available"] or 
+                     status["yahoo_finance"]["available"] or 
+                     status["polygon"]["available"])
+    
+    if not any_available:
         logger.error("No data sources available! System will not function properly.")
 
 

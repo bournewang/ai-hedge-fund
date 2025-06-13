@@ -1,5 +1,5 @@
 from src.graph.state import AgentState, show_agent_reasoning
-from src.tools.hybrid_api import (
+from src.tools.hybrid_api_v2 import (
     get_financial_metrics,
     get_market_cap,
     search_line_items,

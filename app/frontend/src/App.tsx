@@ -18,8 +18,8 @@ function Navigation() {
     { path: '/', label: 'Home', icon: Home },
     { path: '/analysis', label: 'Analysis', icon: BarChart3 },
     { path: '/explore', label: 'Explore', icon: TrendingUp },
-    { path: '/monitoring', label: 'Monitoring', icon: Eye },
-    { path: '/value-picks', label: 'Value Picks', icon: Gem },
+    // { path: '/monitoring', label: 'Monitoring', icon: Eye },
+    // { path: '/value-picks', label: 'Value Picks', icon: Gem },
     { path: '/agents', label: 'AI Masters', icon: Users },
   ];
 
@@ -74,8 +74,8 @@ export default function App() {
           <Route path="/" element={<DashboardPage />} />
           <Route path="/analysis" element={<AnalysisForm onAnalysisStart={handleAnalysisStart} />} />
           <Route path="/explore" element={<ExplorePage />} />
-          <Route path="/monitoring" element={<MonitoringPage />} />
-          <Route path="/value-picks" element={<ValuePicksPage />} />
+          {/* <Route path="/monitoring" element={<MonitoringPage />} /> */}
+          {/* <Route path="/value-picks" element={<ValuePicksPage />} /> */}
           <Route path="/agents" element={<AgentsDescription />} />
         </Routes>
       </Layout>

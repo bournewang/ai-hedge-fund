@@ -4,7 +4,7 @@ from langchain_core.messages import HumanMessage
 from pydantic import BaseModel
 import json
 from typing_extensions import Literal
-from src.tools.hybrid_api import (
+from src.tools.hybrid_api_v2 import (
     get_financial_metrics,
     search_line_items,
     get_market_cap,

@@ -1,7 +1,7 @@
 from langchain_core.messages import HumanMessage
 from src.graph.state import AgentState, show_agent_reasoning
 from src.utils.progress import progress
-from src.tools.hybrid_api import get_prices, prices_to_df
+from src.tools.hybrid_api_v2 import get_prices, prices_to_df
 import json
 
 
