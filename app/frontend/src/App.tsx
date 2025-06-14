@@ -4,11 +4,11 @@ import { DashboardPage } from './components/DashboardPage';
 import { AnalysisForm } from './components/AnalysisForm';
 import { AgentsDescription } from './components/AgentsDescription';
 import { ExplorePage } from './components/ExplorePage';
-import { MonitoringPage } from './components/MonitoringPage';
-import { ValuePicksPage } from './components/ValuePicksPage';
+// import { MonitoringPage } from './components/MonitoringPage';
+// import { ValuePicksPage } from './components/ValuePicksPage';
 import { Layout } from './components/Layout';
 import { Button } from './components/ui/button';
-import { Users, TrendingUp, Eye, Gem, Home, BarChart3 } from 'lucide-react';
+import { Users, TrendingUp, Home, BarChart3 } from 'lucide-react';
 import { ThemeToggle } from './components/ui/theme-toggle';
 
 function Navigation() {

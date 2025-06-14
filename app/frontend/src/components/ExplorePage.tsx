@@ -5,7 +5,6 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { 
   TrendingUp, 
-  Clock, 
   Flame,
   Zap,
   BarChart3,
@@ -34,7 +33,7 @@ export function ExplorePage() {
   const [selectedTickers, setSelectedTickers] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  // const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
   const fetchTrendingData = async () => {
     try {
@@ -42,7 +41,7 @@ export function ExplorePage() {
       setError(null);
       const data = await api.getDayGainers(15); // Get top 15 gainers
       setTrendingStocks(data);
-      setLastUpdated(new Date());
+      // setLastUpdated(new Date());
     } catch (err) {
       setError('Failed to fetch trending stocks. Please try again.');
       console.error('Error fetching trending data:', err);
