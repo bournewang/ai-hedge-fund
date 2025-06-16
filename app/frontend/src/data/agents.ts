@@ -28,8 +28,8 @@ export interface AgentItem {
 
 export const investmentStyles = {
   value: {
-    name: '价值投资',
-    description: '寻找被低估的优质公司，长期持有',
+    name: 'Value Investing',
+    description: 'Find undervalued quality companies and hold long-term',
     icon: '💎',
     color: 'bg-blue-50 border-blue-200 text-blue-800',
     philosophy: [
@@ -64,8 +64,8 @@ export const investmentStyles = {
     ]
   },
   growth: {
-    name: '成长投资',
-    description: '投资于高成长潜力的公司和行业',
+    name: 'Growth Investing',
+    description: 'Invest in companies and industries with high growth potential',
     icon: '🚀',
     color: 'bg-green-50 border-green-200 text-green-800',
     philosophy: [
@@ -100,8 +100,8 @@ export const investmentStyles = {
     ]
   },
   macro: {
-    name: '宏观投资',
-    description: '基于宏观经济趋势进行投资布局',
+    name: 'Macro Investing',
+    description: 'Investment strategy based on macroeconomic trends',
     icon: '🌍',
     color: 'bg-purple-50 border-purple-200 text-purple-800',
     philosophy: [
@@ -136,8 +136,8 @@ export const investmentStyles = {
     ]
   },
   activist: {
-    name: '激进投资',
-    description: '积极介入公司治理，推动价值释放',
+    name: 'Activist Investing',
+    description: 'Actively engage in corporate governance to unlock value',
     icon: '⚡',
     color: 'bg-orange-50 border-orange-200 text-orange-800',
     philosophy: [
@@ -172,8 +172,8 @@ export const investmentStyles = {
     ]
   },
   analyst: {
-    name: '专业分析',
-    description: '基于专业技术和数据分析',
+    name: 'Professional Analysis',
+    description: 'Based on professional techniques and data analysis',
     icon: '📊',
     color: 'bg-indigo-50 border-indigo-200 text-indigo-800',
     philosophy: [
@@ -216,8 +216,8 @@ export const agents: AgentItem[] = [
     "description": "The Dean of Valuation",
     "order": 0,
     "category": "macro",
-    "category_name": "宏观投资派",
-    "investment_style": "估值院长，故事与数字并重",
+    "category_name": "Macro Investing",
+    "investment_style": "Valuation expert, balancing stories and numbers",
     "biography": `Aswath Damodaran is a Professor of Finance at the Stern School of Business at NYU. Known as the 'Dean of Valuation', 
       he has revolutionized how academics and practitioners approach company valuation. His work combines rigorous financial theory 
       with practical applications, emphasizing that every number has a story and every story needs a number.`,
@@ -264,8 +264,8 @@ export const agents: AgentItem[] = [
     "description": "The Father of Value Investing",
     "order": 1,
     "category": "value",
-    "category_name": "价值投资派",
-    "investment_style": "价值投资之父，安全边际理论",
+    "category_name": "Value Investing",
+    "investment_style": "Father of value investing, margin of safety theory",
     "biography": `Benjamin Graham (1894-1976) was a British-born American economist and professional investor. He developed 
       value investing and wrote two of investment's foundational texts: Security Analysis (1934) and The Intelligent 
       Investor (1949). His most famous student was Warren Buffett, who credits Graham with laying the foundation for his 
@@ -313,8 +313,8 @@ export const agents: AgentItem[] = [
     "description": "The Activist Investor",
     "order": 2,
     "category": "activist",
-    "category_name": "激进投资派",
-    "investment_style": "激进投资者，勇于推动变革",
+    "category_name": "Activist Investing",
+    "investment_style": "Activist investor, courageously driving change",
     "biography": `Bill Ackman is the founder and CEO of Pershing Square Capital Management. Known for his 
       activist investing approach, he takes large positions in public companies and pushes for changes to 
       unlock shareholder value. His high-profile investments and public campaigns have made him one of the 
@@ -362,8 +362,8 @@ export const agents: AgentItem[] = [
     "description": "The Queen of Growth Investing",
     "order": 3,
     "category": "growth",
-    "category_name": "成长投资派",
-    "investment_style": "颠覆性创新女王，科技成长专家",
+    "category_name": "Growth Investing",
+    "investment_style": "Queen of disruptive innovation, tech growth expert",
     "biography": `Cathie Wood is the founder and CEO of ARK Invest, known for her investments in disruptive innovation. 
       She has revolutionized thematic investing by focusing on companies leading technological breakthroughs in areas like 
       AI, robotics, blockchain, and genomics. Her bold predictions and conviction-based investing style have earned her a 
@@ -411,8 +411,8 @@ export const agents: AgentItem[] = [
     "description": "The Rational Thinker",
     "order": 4,
     "category": "value",
-    "category_name": "价值投资派",
-    "investment_style": "理性思维者，优秀企业的公平价格",
+    "category_name": "Value Investing",
+    "investment_style": "Rational thinker, fair price for wonderful companies",
     "biography": `Charlie Munger, born in 1924, is Warren Buffett's long-time business partner and 
       Vice Chairman of Berkshire Hathaway. Known for his multidisciplinary approach to investing and 
       emphasis on mental models, Munger has helped shape Berkshire's strategy of buying wonderful 
@@ -460,8 +460,8 @@ export const agents: AgentItem[] = [
     "description": "The Big Short Contrarian",
     "order": 5,
     "category": "value",
-    "category_name": "价值投资派",
-    "investment_style": "大空头逆向投资者，深度价值挖掘",
+    "category_name": "Value Investing",
+    "investment_style": "The Big Short contrarian investor, deep value excavation",
     "biography": `Michael Burry, born in 1971, is a physician-turned-investor known for his successful 
       bet against the housing bubble in 2008. He founded Scion Capital and gained fame through Michael 
       Lewis's book "The Big Short". His investment approach combines deep value investing with contrarian 
@@ -509,8 +509,8 @@ export const agents: AgentItem[] = [
     "description": "The 10-Bagger Investor",
     "order": 6,
     "category": "growth",
-    "category_name": "成长投资派",
-    "investment_style": "十倍股猎手，日常业务成长投资",
+    "category_name": "Growth Investing",
+    "investment_style": "Ten-bagger hunter, everyday business growth investing",
     "biography": `Peter Lynch (born 1944) is renowned for his management of the Magellan Fund at Fidelity 
       Investments between 1977 and 1990. During his tenure, the fund's assets grew from $20 million to $14 billion, 
       averaging a 29.2% annual return. Lynch is famous for his "invest in what you know" philosophy and ability to 
@@ -558,8 +558,8 @@ export const agents: AgentItem[] = [
     "description": "The Scuttlebutt Investor",
     "order": 7,
     "category": "growth",
-    "category_name": "成长投资派",
-    "investment_style": "精细成长投资者，深度调研专家",
+    "category_name": "Growth Investing",
+    "investment_style": "Precision growth investor, deep research expert",
     "biography": `Philip Fisher (1907-2004) was a pioneer of growth investing and author of "Common Stocks 
       and Uncommon Profits". His "scuttlebutt" method involved extensive research through industry contacts, 
       competitors, and customers. Fisher influenced many investors, including Warren Buffett, with his focus 
@@ -607,8 +607,8 @@ export const agents: AgentItem[] = [
     "description": "The Big Bull Of India",
     "order": 8,
     "category": "activist",
-    "category_name": "激进投资派",
-    "investment_style": "印度股神，大胆持仓"
+    "category_name": "Activist Investing",
+    "investment_style": "The Big Bull of India, bold position taking"
   },
   {
     "key": "stanley_druckenmiller",
@@ -616,8 +616,8 @@ export const agents: AgentItem[] = [
     "description": "The Macro Investor",
     "order": 9,
     "category": "macro",
-    "category_name": "宏观投资派",
-    "investment_style": "宏观投资传奇，不对称机会猎手"
+    "category_name": "Macro Investing",
+    "investment_style": "Macro investing legend, asymmetric opportunity hunter"
   },
   {
     "key": "warren_buffett",
@@ -625,8 +625,8 @@ export const agents: AgentItem[] = [
     "description": "The Oracle of Omaha",
     "order": 10,
     "category": "value",
-    "category_name": "价值投资派",
-    "investment_style": "奥马哈先知，寻找优秀公司的合理价格",
+    "category_name": "Value Investing",
+    "investment_style": "Oracle of Omaha, finding reasonable prices for excellent companies",
     "biography": `Warren Buffett, born in 1930, is one of the most successful investors of all time. 
       As the chairman and CEO of Berkshire Hathaway, he has achieved remarkable returns through 
       value investing principles learned from Benjamin Graham and refined with Charlie Munger. 
@@ -675,8 +675,8 @@ export const agents: AgentItem[] = [
     "description": "Chart Pattern Specialist",
     "order": 11,
     "category": "analyst",
-    "category_name": "专业分析派",
-    "investment_style": "图表模式专家，技术指标分析"
+    "category_name": "Professional Analysis",
+    "investment_style": "Chart pattern expert, technical indicator analysis"
   },
   {
     "key": "fundamentals_analyst",
@@ -684,8 +684,8 @@ export const agents: AgentItem[] = [
     "description": "Financial Statement Specialist",
     "order": 12,
     "category": "analyst",
-    "category_name": "专业分析派",
-    "investment_style": "财务报表专家，企业价值评估"
+    "category_name": "Professional Analysis",
+    "investment_style": "Financial statement expert, corporate valuation"
   },
   {
     "key": "sentiment_analyst",
@@ -693,8 +693,8 @@ export const agents: AgentItem[] = [
     "description": "Market Sentiment Specialist",
     "order": 13,
     "category": "analyst",
-    "category_name": "专业分析派",
-    "investment_style": "市场情绪专家，投资者心理分析"
+    "category_name": "Professional Analysis",
+    "investment_style": "Market sentiment expert, investor psychology analysis"
   },
   {
     "key": "valuation_analyst",
@@ -702,8 +702,8 @@ export const agents: AgentItem[] = [
     "description": "Company Valuation Specialist",
     "order": 14,
     "category": "analyst",
-    "category_name": "专业分析派",
-    "investment_style": "公司估值专家，内在价值计算"
+    "category_name": "Professional Analysis",
+    "investment_style": "Company valuation expert, intrinsic value calculation"
   },
   {
     "key": "risk_manager",
@@ -711,8 +711,8 @@ export const agents: AgentItem[] = [
     "description": "Risk Management Specialist",
     "order": 15,
     "category": "risk",
-    "category_name": "风险管理派",
-    "investment_style": "风险管理专家，投资风险评估"
+    "category_name": "Risk Management",
+    "investment_style": "Risk management expert, investment risk assessment"
   },
   {
     "key": "portfolio_manager",
@@ -720,8 +720,8 @@ export const agents: AgentItem[] = [
     "description": "Portfolio Management Specialist",
     "order": 16,
     "category": "risk",
-    "category_name": "风险管理派",
-    "investment_style": "投资组合专家，资产配置优化"
+    "category_name": "Risk Management",
+    "investment_style": "Portfolio expert, asset allocation optimization"
   },
   
 ];

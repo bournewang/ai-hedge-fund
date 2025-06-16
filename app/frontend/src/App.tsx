@@ -11,25 +11,28 @@ import { Layout } from './components/Layout';
 import { Button } from './components/ui/button';
 import { Users, TrendingUp, Home, BarChart3, Clock } from 'lucide-react';
 import { ThemeToggle } from './components/ui/theme-toggle';
+import { LanguageSwitcher } from './components/LanguageSwitcher';
+import { useLanguage } from './hooks/useLanguage';
 
 function Navigation() {
   const location = useLocation();
+  const { t } = useLanguage();
 
   const navItems = [
-    { path: '/', label: 'Home', icon: Home },
-    { path: '/analysis', label: 'Analysis', icon: BarChart3 },
-    { path: '/explore', label: 'Explore', icon: TrendingUp },
-    { path: '/recent-analyses', label: 'Recent Analyses', icon: Clock },
-    // { path: '/monitoring', label: 'Monitoring', icon: Eye },
-    // { path: '/value-picks', label: 'Value Picks', icon: Gem },
-    { path: '/agents', label: 'AI Masters', icon: Users },
+    { path: '/', label: t('navigation.home'), icon: Home },
+    { path: '/analysis', label: t('navigation.analysis'), icon: BarChart3 },
+    { path: '/explore', label: t('navigation.explore'), icon: TrendingUp },
+    { path: '/recent-analyses', label: t('navigation.recentAnalyses'), icon: Clock },
+    // { path: '/monitoring', label: t('navigation.monitoring'), icon: Eye },
+    // { path: '/value-picks', label: t('navigation.valuePicks'), icon: Gem },
+    { path: '/agents', label: t('navigation.aiMasters'), icon: Users },
   ];
 
   return (
     <div className="bg-background border-b">
       <div className="max-w-6xl mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
-          <Link to="/" className="text-xl font-bold text-primary">AI Hedge Fund</Link>
+          <Link to="/" className="text-xl font-bold text-primary">{t('navigation.brandTitle')}</Link>
           <div className="flex items-center gap-2">
             {navItems.map((item) => {
               const Icon = item.icon;
@@ -48,7 +51,10 @@ function Navigation() {
             })}
           </div>
 
-          <ThemeToggle/>
+          <div className="flex items-center gap-3">
+            <LanguageSwitcher />
+            <ThemeToggle />
+          </div>
         </div>
       </div>
     </div>

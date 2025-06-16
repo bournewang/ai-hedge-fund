@@ -15,6 +15,7 @@ import {
   TableIcon
 } from 'lucide-react';
 import { agents, type AgentItem } from '@/data/agents';
+import { useLanguage } from '@/hooks/useLanguage';
 
 interface AnalysisResultsTableProps {
   selectedAgents: string[];
@@ -46,6 +47,7 @@ export function AnalysisResultsTable({
   outputNodeData 
 }: AnalysisResultsTableProps) {
   const [activeTab, setActiveTab] = useState('summary');
+  const { t } = useLanguage();
 
   // Get agent info
   const getAgentInfo = (agentKey: string): AgentItem | null => {
@@ -146,16 +148,16 @@ export function AnalysisResultsTable({
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2">
             <Eye className="h-5 w-5 text-green-600 dark:text-green-400" />
-            分析结果
+            {t('analysisResultsTable.title')}
           </CardTitle>
           <div className="flex gap-2">
             <Button variant="outline" size="sm" onClick={handleExportCSV}>
               <TableIcon className="h-4 w-4 mr-2" />
-              导出CSV
+              {t('analysisResultsTable.exportCSV')}
             </Button>
             <Button variant="outline" size="sm" onClick={handleExportResults}>
               <Download className="h-4 w-4 mr-2" />
-              导出JSON
+              {t('analysisResultsTable.exportJSON')}
             </Button>
           </div>
         </div>
@@ -163,9 +165,9 @@ export function AnalysisResultsTable({
       <CardContent>
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="summary">汇总表格</TabsTrigger>
-            <TabsTrigger value="detailed">详细视图</TabsTrigger>
-            <TabsTrigger value="export">导出视图</TabsTrigger>
+            <TabsTrigger value="summary">{t('analysisResultsTable.summaryTab')}</TabsTrigger>
+            <TabsTrigger value="detailed">{t('analysisResultsTable.detailedTab')}</TabsTrigger>
+            <TabsTrigger value="export">{t('analysisResultsTable.exportTab')}</TabsTrigger>
           </TabsList>
 
           {/* Summary Table */}
@@ -174,8 +176,8 @@ export function AnalysisResultsTable({
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="w-20">股票</TableHead>
-                    <TableHead className="w-32">最终决策</TableHead>
+                    <TableHead className="w-20">{t('analysisResultsTable.stock')}</TableHead>
+                    <TableHead className="w-32">{t('analysisResultsTable.finalDecision')}</TableHead>
                     {selectedAgents.map(agentKey => {
                       const agentInfo = getAgentInfo(agentKey);
                       return (
@@ -211,7 +213,7 @@ export function AnalysisResultsTable({
                               </Badge>
                               {decision.confidence && (
                                 <span className="text-xs text-muted-foreground">
-                                  置信度: {decision.confidence}%
+                                  {t('analysisResultsTable.confidence')}: {decision.confidence}%
                                 </span>
                               )}
                             </div>
@@ -242,8 +244,8 @@ export function AnalysisResultsTable({
                                 </div>
                               ) : agentKey === 'risk_management' && agentResults?.remaining_position_limit !== undefined ? (
                                 <div className="text-xs text-muted-foreground">
-                                  <div>仓位: ${agentResults.remaining_position_limit?.toLocaleString()}</div>
-                                  <div>价格: ${agentResults.current_price?.toLocaleString()}</div>
+                                  <div>{t('analysisResultsTable.position')}: ${agentResults.remaining_position_limit?.toLocaleString()}</div>
+                                  <div>{t('analysisResultsTable.price')}: ${agentResults.current_price?.toLocaleString()}</div>
                                 </div>
                               ) : (
                                 <span className="text-muted-foreground">-</span>
@@ -279,7 +281,7 @@ export function AnalysisResultsTable({
                       <CardTitle className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
                           <Eye className="h-5 w-5 text-blue-600 dark:text-blue-500" />
-                          {ticker} 分析结果
+{ticker} {t('analysisResultsTable.analysisResults')}
                         </div>
                         {decision && (
                           <Badge 
@@ -314,13 +316,13 @@ export function AnalysisResultsTable({
                                   </div>
                                 </div>
                                 <div className="text-sm text-gray-600 dark:text-gray-400 space-y-1">
-                                  <div>可用仓位: {agentResults.remaining_position_limit?.toLocaleString()} USD</div>
-                                  <div>当前价格: {agentResults.current_price?.toLocaleString()} USD</div>
+                                  <div>{t('analysisResultsTable.availablePosition')}: {agentResults.remaining_position_limit?.toLocaleString()} USD</div>
+                                  <div>{t('analysisResultsTable.currentPrice')}: {agentResults.current_price?.toLocaleString()} USD</div>
                                   {agentResults.risk_reasoning && (
                                     <>
-                                      <div>可用现金: {agentResults.risk_reasoning.available_cash?.toLocaleString()} USD</div>
-                                      <div>当前持仓: {agentResults.risk_reasoning.current_position_value?.toLocaleString()} USD</div>
-                                      <div>仓位限制: {agentResults.risk_reasoning.position_limit?.toLocaleString()} USD</div>
+                                      <div>{t('analysisResultsTable.availableCash')}: {agentResults.risk_reasoning.available_cash?.toLocaleString()} USD</div>
+                                      <div>{t('analysisResultsTable.currentPosition')}: {agentResults.risk_reasoning.current_position_value?.toLocaleString()} USD</div>
+                                      <div>{t('analysisResultsTable.positionLimit')}: {agentResults.risk_reasoning.position_limit?.toLocaleString()} USD</div>
                                     </>
                                   )}
                                 </div>
@@ -350,7 +352,7 @@ export function AnalysisResultsTable({
                               </div>
                               {agentResults.confidence && (
                                 <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                                  <span>置信度:</span>
+                                  <span>{t('analysisResultsTable.confidence')}:</span>
                                   <Badge variant="outline">
                                     {Math.round(agentResults.confidence)}%
                                   </Badge>
@@ -373,16 +375,16 @@ export function AnalysisResultsTable({
           <TabsContent value="export" className="mt-6">
             <div className="space-y-4">
               <div className="text-sm text-muted-foreground">
-                此视图专为导出设计，包含所有关键数据的简洁表格格式。
+{t('analysisResultsTable.exportDescription')}
               </div>
               <div className="overflow-x-auto">
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>股票代码</TableHead>
-                      <TableHead>最终决策</TableHead>
-                      <TableHead>置信度</TableHead>
-                      <TableHead>决策理由</TableHead>
+                      <TableHead>{t('analysisResultsTable.stockCode')}</TableHead>
+                      <TableHead>{t('analysisResultsTable.finalDecision')}</TableHead>
+                      <TableHead>{t('analysisResultsTable.confidence')}</TableHead>
+                      <TableHead>{t('analysisResultsTable.reasoning')}</TableHead>
                       {selectedAgents.map(agentKey => {
                         const agentInfo = getAgentInfo(agentKey);
                         return (

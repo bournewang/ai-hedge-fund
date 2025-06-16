@@ -1,0 +1,266 @@
+{
+    "common": {
+      "loading": "Loading...",
+      "error": "Error",
+      "success": "Success",
+      "cancel": "Cancel",
+      "confirm": "Confirm",
+      "reset": "Reset",
+      "add": "Add",
+      "remove": "Remove",
+      "export": "Export Results",
+      "search": "Search"
+    },
+    "navigation": {
+      "brandTitle": "AI Hedge Fund",
+      "home": "Home",
+      "analysis": "Analysis",
+      "explore": "Explore",
+      "recentAnalyses": "Recent Analyses",
+      "monitoring": "Monitoring",
+      "valuePicks": "Value Picks",
+      "aiMasters": "AI Masters"
+    },
+    "header": {
+      "title": "AI Hedge Fund",
+      "subtitle": "Professional stock analysis by 17 world-class investment masters"
+    },
+    "analysisForm": {
+      "step1": {
+        "title": "Step 1: Select Stocks to Analyze",
+        "description": "Enter stock symbols separated by commas. Supports US stock codes like AAPL, MSFT, NVDA etc. Now with real-time search and validation!",
+        "searchPlaceholder": "Search stock symbols (e.g. AAPL, MSFT)...",
+        "bulkInputLabel": "Or bulk input (comma separated):",
+        "bulkInputPlaceholder": "Enter stock symbols, e.g. AAPL,MSFT,NVDA...",
+        "loadingSymbols": "Loading stock data...",
+        "loadedFromTrends": "Loaded from trends page: Auto-filled with selected trending stocks",
+        "invalidSymbols": "Invalid stock symbols: {{symbols}}. Please enter valid US stock symbols (e.g. AAPL, MSFT)",
+        "validSymbols": "✓ Selected {{count}} stocks: {{symbols}}",
+        "selectedStocks": "Selected Stocks:",
+        "popularRecommendations": "Popular Stock Recommendations:"
+      },
+      "step2": {
+        "title": "Step 2: Choose Investment Style",
+        "description": "Choose an investment style, and we'll recommend corresponding AI investment masters"
+      },
+      "step3": {
+        "title": "Step 3: Select AI Investment Masters",
+        "description": "Select AI investment masters to participate in the analysis (recommend 3-5 masters)"
+      },
+      "step4": {
+        "title": "🚀 Ready to Start Analysis",
+        "summary": "{{stocks}} stocks × {{masters}} investment masters",
+        "stocksLabel": "Stocks to Analyze",
+        "mastersLabel": "Investment Masters",
+        "validationError": "Please enter valid stock symbols before starting analysis",
+        "analyzing": "Analyzing...",
+        "startAnalysis": "Start AI Analysis",
+        "estimatedTime": "Estimated analysis time: {{min}} - {{max}} minutes"
+      }
+    },
+    "analysisResults": {
+      "title": "Analysis Progress Overview",
+      "completed": "Analysis completed",
+      "processing": "Processing analysis results...",
+      "analyzing": "Analyzing {{stocks}} stocks using {{masters}} investment masters",
+      "totalProgress": "Total Progress: {{progress}}%",
+      "statusCompleted": "Completed: {{count}}",
+      "statusInProgress": "In Progress: {{count}}",
+      "statusWaiting": "Waiting: {{count}}",
+      "statusError": "Error: {{count}}",
+      "processingTitle": "Processing Analysis Results",
+      "processingDescription": "All investment masters have completed analysis, summarizing investment recommendations...",
+      "exportResults": "Export Results"
+    },
+    "analysisResultsTable": {
+      "title": "Analysis Results",
+      "exportCSV": "Export CSV",
+      "exportJSON": "Export JSON",
+      "summaryTab": "Summary Table",
+      "detailedTab": "Detailed View",
+      "exportTab": "Export View",
+      "stock": "Stock",
+      "finalDecision": "Final Decision",
+      "confidence": "Confidence",
+      "position": "Position",
+      "price": "Price",
+      "analysisResults": "Analysis Results",
+      "availablePosition": "Available Position",
+      "currentPrice": "Current Price",
+      "availableCash": "Available Cash",
+      "currentPosition": "Current Position",
+      "positionLimit": "Position Limit",
+      "exportDescription": "This view is designed for export, containing a concise table format with all key data.",
+      "stockCode": "Stock Code",
+      "reasoning": "Reasoning"
+    },
+    "analysisProgressMatrix": {
+      "title": "Analysis Progress Matrix",
+      "investmentMasters": "Investment Masters",
+      "detailsTitle": "Details",
+      "stockCode": "Stock Code",
+      "status": "Status",
+      "message": "Message",
+      "analyzing": "Analyzing {{ticker}}",
+      "clickToView": "Click on a matrix cell to view details",
+      "statusComplete": "Complete",
+      "statusInProgress": "In Progress",
+      "statusError": "Error",
+      "statusWaiting": "Waiting"
+    },
+    "dashboard": {
+      "hero": {
+        "title": "AI Hedge Fund Platform",
+        "subtitle": "Harness the wisdom of 17 legendary investors powered by artificial intelligence. Make smarter investment decisions with data-driven insights.",
+        "startAnalysis": "Start Analysis",
+        "explore": "Explore"
+      },
+      "recentAnalyses": {
+        "title": "Recent Analyses",
+        "viewAll": "View All",
+        "loading": "Loading recent analyses...",
+        "loadError": "Failed to load recent analyses",
+        "fallbackData": "Showing fallback data"
+      },
+      "trending": {
+        "title": "Trending Now",
+        "explore": "Explore",
+        "loading": "Loading trending stocks...",
+        "loadError": "Failed to load trending stocks",
+        "fallbackData": "Showing fallback data",
+        "volume": "Vol"
+      },
+      "features": {
+        "explore": {
+          "title": "🔍 Explore",
+          "description": "Discover trending stocks with buy signals from our AI analysts",
+          "action": "Start Exploring"
+        },
+        "recentAnalysis": {
+          "title": "📊 Recent Analysis",
+          "description": "View all your recent AI analysis results with performance tracking",
+          "action": "View Analysis"
+        },
+        "valuePicks": {
+          "title": "💎 Value Picks",
+          "description": "Uncover undervalued gems using our expert value investing algorithms",
+          "action": "Find Value"
+        },
+        "aiAgents": {
+          "title": "🤖 AI Agents",
+          "description": "Learn about our 17 legendary investor AI personalities and their strategies",
+          "action": "Meet Agents"
+        },
+        "analysisNow": {
+          "title": "⚡ Analysis Now",
+          "description": "Start analyzing stocks immediately with our AI-powered investment insights",
+          "action": "Analyze Now"
+        }
+      },
+      "cta": {
+        "title": "Ready to Make Smarter Investments?",
+        "subtitle": "Join thousands of investors who trust our AI-powered platform for data-driven investment decisions.",
+        "action": "Start Your First Analysis"
+      }
+    },
+    "explore": {
+      "title": "Explore Trending Stocks",
+      "subtitle": "Discover today's top gainers and build your analysis portfolio",
+      "realTimeData": "Real-time Data",
+      "loadingStocks": "Loading trending stocks...",
+      "fetchError": "Failed to fetch trending stocks. Please try again.",
+      "tryAgain": "Try Again",
+      "topGainers": "Top {{count}} Day Gainers",
+      "marketDataSource": "Market data from Yahoo Finance",
+      "sectors": {
+        "all": "All",
+        "technology": "Technology",
+        "healthcare": "Healthcare", 
+        "finance": "Finance",
+        "consumerDiscretionary": "Consumer Discretionary",
+        "energy": "Energy",
+        "other": "Other"
+      },
+      "metrics": {
+        "marketCap": "Market Cap:",
+        "peRatio": "P/E Ratio:"
+      },
+      "selection": {
+        "addedToAnalysis": "✓ Added to Analysis",
+        "clickToAdd": "Click to add to analysis",
+        "selectedStocks": "Selected Stocks",
+        "selectToAnalyze": "Select stocks to analyze",
+        "stocksSelected": "{{count}} stock{{plural}} selected",
+        "analyze": "Analyze ({{count}})",
+        "clearAll": "Clear All",
+        "clickToAddInstructions": "Click on stock cards to add them to your analysis portfolio",
+        "readyToAnalyze": "Ready to analyze {{count}} trending stock{{plural}} with AI"
+      },
+      "emptyState": {
+        "title": "No trending stocks found",
+        "description": "Try adjusting your sector filter or refresh the data"
+      }
+    },
+    "signals": {
+      "STRONG BUY": "STRONG BUY",
+      "BUY": "BUY",
+      "HOLD": "HOLD",
+      "SELL": "SELL",
+      "STRONG SELL": "STRONG SELL"
+    },
+    "investmentStyles": {
+      "value": {
+        "name": "Value Investing",
+        "description": "Find undervalued quality companies and hold long-term"
+      },
+      "growth": {
+        "name": "Growth Investing", 
+        "description": "Invest in companies and industries with high growth potential"
+      },
+      "macro": {
+        "name": "Macro Investing",
+        "description": "Investment strategy based on macroeconomic trends"
+      },
+      "activist": {
+        "name": "Activist Investing",
+        "description": "Actively engage in corporate governance to unlock value"
+      },
+      "analyst": {
+        "name": "Professional Analysis",
+        "description": "Based on professional techniques and data analysis"
+      },
+      "risk": {
+        "name": "Risk Management",
+        "description": "Focus on risk assessment and portfolio optimization"
+      }
+    },
+    "agents": {
+      "categories": {
+        "macro": "Macro Investing",
+        "value": "Value Investing",
+        "activist": "Activist Investing",
+        "growth": "Growth Investing",
+        "analyst": "Professional Analysis",
+        "risk": "Risk Management"
+      },
+      "styles": {
+        "aswath_damodaran": "Valuation expert, balancing stories and numbers",
+        "ben_graham": "Father of value investing, margin of safety theory",
+        "bill_ackman": "Activist investor, courageously driving change",
+        "cathie_wood": "Queen of disruptive innovation, tech growth expert",
+        "charlie_munger": "Rational thinker, fair price for wonderful companies",
+        "michael_burry": "The Big Short contrarian investor, deep value excavation",
+        "peter_lynch": "Ten-bagger hunter, everyday business growth investing",
+        "philip_fisher": "Precision growth investor, deep research expert",
+        "rakesh_jhunjhunwala": "The Big Bull of India, bold position taking",
+        "stanley_druckenmiller": "Macro investing legend, asymmetric opportunity hunter",
+        "warren_buffett": "Oracle of Omaha, finding reasonable prices for excellent companies",
+        "technical_analyst": "Chart pattern expert, technical indicator analysis",
+        "fundamentals_analyst": "Financial statement expert, corporate valuation",
+        "sentiment_analyst": "Market sentiment expert, investor psychology analysis",
+        "valuation_analyst": "Company valuation expert, intrinsic value calculation",
+        "risk_manager": "Risk management expert, investment risk assessment",
+        "portfolio_manager": "Portfolio expert, asset allocation optimization"
+      }
+    }
+  }

@@ -16,6 +16,7 @@ import {
   BarChart
 } from 'lucide-react';
 import { api, TrendingStock } from '@/services/api';
+import { useLanguage } from '@/hooks/useLanguage';
 
 // Map sector names that might come from the API
 const normalizeSecctor = (sector: string | null): string => {
@@ -24,11 +25,20 @@ const normalizeSecctor = (sector: string | null): string => {
   return sector;
 };
 
-const sectors = ['All', 'Technology', 'Healthcare', 'Finance', 'Consumer Discretionary', 'Energy', 'Other'];
-
 export function ExplorePage() {
   const navigate = useNavigate();
-  const [selectedSector, setSelectedSector] = useState('All');
+  const { t } = useLanguage();
+  
+  // const sectors = [
+  //   { key: 'all', label: t('explore.sectors.all') },
+  //   { key: 'technology', label: t('explore.sectors.technology') },
+  //   { key: 'healthcare', label: t('explore.sectors.healthcare') },
+  //   { key: 'finance', label: t('explore.sectors.finance') },
+  //   { key: 'consumerDiscretionary', label: t('explore.sectors.consumerDiscretionary') },
+  //   { key: 'energy', label: t('explore.sectors.energy') },
+  //   { key: 'other', label: t('explore.sectors.other') }
+  // ];
+  // const [selectedSector, setSelectedSector] = useState('all');
   const [trendingStocks, setTrendingStocks] = useState<TrendingStock[]>([]);
   const [selectedTickers, setSelectedTickers] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
@@ -43,7 +53,7 @@ export function ExplorePage() {
       setTrendingStocks(data);
       // setLastUpdated(new Date());
     } catch (err) {
-      setError('Failed to fetch trending stocks. Please try again.');
+      setError(t('explore.fetchError'));
       console.error('Error fetching trending data:', err);
     } finally {
       setLoading(false);
@@ -54,13 +64,13 @@ export function ExplorePage() {
     fetchTrendingData();
   }, []);
 
-  const filteredStocks = useMemo(() => {
-    return trendingStocks.filter(stock => {
-      const stockSector = normalizeSecctor(stock.sector);
-      const matchesSector = selectedSector === 'All' || stockSector === selectedSector;
-      return matchesSector;
-    });
-  }, [trendingStocks, selectedSector]);
+  // const filteredStocks = useMemo(() => {
+  //   return trendingStocks.filter(stock => {
+  //     const stockSector = normalizeSecctor(stock.sector);
+  //     const matchesSector = selectedSector === 'all' || stockSector === selectedSector;
+  //     return matchesSector;
+  //   });
+  // }, [trendingStocks, selectedSector]);
 
   const selectedStockDetails = useMemo(() => {
     return selectedTickers.map(ticker => 
@@ -105,7 +115,7 @@ export function ExplorePage() {
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <RefreshCw className="w-8 h-8 animate-spin mx-auto mb-4" />
-          <p className="text-lg">Loading trending stocks...</p>
+          <p className="text-lg">{t('explore.loadingStocks')}</p>
         </div>
       </div>
     );
@@ -116,10 +126,10 @@ export function ExplorePage() {
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <AlertCircle className="w-8 h-8 text-red-500 mx-auto mb-4" />
-          <p className="text-lg text-red-600 mb-4">{error}</p>
+          <p className="text-lg text-red-600 mb-4">{t('explore.fetchError')}</p>
           <Button onClick={fetchTrendingData}>
             <RefreshCw className="w-4 h-4 mr-2" />
-            Try Again
+            {t('explore.tryAgain')}
           </Button>
         </div>
       </div>
@@ -133,15 +143,15 @@ export function ExplorePage() {
         <div className="max-w-6xl mx-auto px-4">
           <div className="text-center space-y-4">
             <h1 className="text-4xl md:text-5xl font-bold">
-              🔍 Explore Trending Stocks
+              🔍 {t('explore.title')}
             </h1>
             <p className="text-xl md:text-2xl text-green-100">
-              Discover today's top gainers and build your analysis portfolio
+              {t('explore.subtitle')}
             </p>
             <div className="flex items-center justify-center gap-4 mt-8">
               <Badge variant="secondary" className="px-4 py-2 text-lg">
                 <TrendingUp className="w-5 h-5 mr-2" />
-                Real-time Data
+                {t('explore.realTimeData')}
               </Badge>
               {/* <Badge variant="secondary" className="px-4 py-2 text-lg">
                 <Clock className="w-5 h-5 mr-2" />
@@ -177,29 +187,29 @@ export function ExplorePage() {
             <div className="mb-8 space-y-4">
               <div className="flex justify-between items-center">
                 <h2 className="text-2xl font-bold">
-                  Top {trendingStocks.length} Day Gainers
+                  {t('explore.topGainers', { count: trendingStocks.length })}
                 </h2>
-                <span className="text-sm text-muted-foreground">
-                  Market data from Yahoo Finance
-                </span>
+                {/* <span className="text-sm text-muted-foreground">
+                  {t('explore.marketDataSource')}
+                </span> */}
               </div>
-              <div className="flex flex-wrap gap-2">
+              {/* <div className="flex flex-wrap gap-2">
                 {sectors.map((sector) => (
                   <Button
-                    key={sector}
-                    variant={selectedSector === sector ? "default" : "outline"}
+                    key={sector.key}
+                    variant={selectedSector === sector.key ? "default" : "outline"}
                     size="sm"
-                    onClick={() => setSelectedSector(sector)}
+                    onClick={() => setSelectedSector(sector.key)}
                   >
-                    {sector}
+                    {sector.label}
                   </Button>
                 ))}
-              </div>
+              </div> */}
             </div>
 
             {/* Stock Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-              {filteredStocks.map((stock) => {
+              {trendingStocks.map((stock) => {
                 const isSelected = selectedTickers.includes(stock.symbol);
                 
                 return (
@@ -260,12 +270,12 @@ export function ExplorePage() {
                       {/* Key Metrics */}
                       <div className="text-xs text-muted-foreground space-y-1">
                         <div className="flex justify-between">
-                          <span>Market Cap:</span>
+                          <span>{t('explore.metrics.marketCap')}</span>
                           <span className="font-medium">{stock.market_cap_formatted}</span>
                         </div>
                         {stock.pe_ratio && (
                           <div className="flex justify-between">
-                            <span>P/E Ratio:</span>
+                            <span>{t('explore.metrics.peRatio')}</span>
                             <span className="font-medium">{stock.pe_ratio.toFixed(2)}</span>
                           </div>
                         )}
@@ -275,11 +285,11 @@ export function ExplorePage() {
                       <div className="text-xs text-center pt-2 border-t">
                         {isSelected ? (
                           <span className="text-blue-600 dark:text-blue-400 font-medium">
-                            ✓ Added to Analysis
+                            {t('explore.selection.addedToAnalysis')}
                           </span>
                         ) : (
                           <span className="text-muted-foreground">
-                            Click to add to analysis
+                            {t('explore.selection.clickToAdd')}
                           </span>
                         )}
                       </div>
@@ -290,11 +300,11 @@ export function ExplorePage() {
             </div>
 
             {/* Empty State */}
-            {filteredStocks.length === 0 && !loading && (
+            {trendingStocks.length === 0 && !loading && (
               <div className="text-center py-12">
                 <TrendingUp className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-xl font-semibold text-foreground mb-2">No trending stocks found</h3>
-                <p className="text-muted-foreground">Try adjusting your sector filter or refresh the data</p>
+                <h3 className="text-xl font-semibold text-foreground mb-2">{t('explore.emptyState.title')}</h3>
+                <p className="text-muted-foreground">{t('explore.emptyState.description')}</p>
               </div>
             )}
           </div>
@@ -306,12 +316,15 @@ export function ExplorePage() {
                 <CardHeader className="flex-shrink-0">
                   <CardTitle className="flex items-center gap-2">
                     <BarChart className="w-5 h-5" />
-                    Selected Stocks
+                    {t('explore.selection.selectedStocks')}
                   </CardTitle>
                   <CardDescription>
                     {selectedTickers.length === 0 
-                      ? 'Select stocks to analyze'
-                      : `${selectedTickers.length} stock${selectedTickers.length > 1 ? 's' : ''} selected`
+                      ? t('explore.selection.selectToAnalyze')
+                      : t('explore.selection.stocksSelected', { 
+                          count: selectedTickers.length, 
+                          plural: selectedTickers.length > 1 ? 's' : '' 
+                        })
                     }
                   </CardDescription>
                 </CardHeader>
@@ -320,7 +333,7 @@ export function ExplorePage() {
                     <div className="text-center py-8">
                       <BarChart className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
                       <p className="text-sm text-muted-foreground">
-                        Click on stock cards to add them to your analysis portfolio
+                        {t('explore.selection.clickToAddInstructions')}
                       </p>
                     </div>
                   ) : (
@@ -366,7 +379,7 @@ export function ExplorePage() {
                           disabled={selectedTickers.length === 0}
                         >
                           <BarChart className="w-4 h-4 mr-2" />
-                          Analyze ({selectedTickers.length})
+                          {t('explore.selection.analyze', { count: selectedTickers.length })}
                         </Button>
                         
                         <Button 
@@ -377,13 +390,16 @@ export function ExplorePage() {
                           disabled={selectedTickers.length === 0}
                         >
                           <Trash2 className="w-3 h-3 mr-2" />
-                          Clear All
+                          {t('explore.selection.clearAll')}
                         </Button>
                       </div>
 
                       {/* Summary - Fixed at bottom */}
                       <div className="flex-shrink-0 text-xs text-muted-foreground text-center pt-2 border-t">
-                        Ready to analyze {selectedTickers.length} trending stock{selectedTickers.length > 1 ? 's' : ''} with AI
+                        {t('explore.selection.readyToAnalyze', { 
+                          count: selectedTickers.length, 
+                          plural: selectedTickers.length > 1 ? 's' : '' 
+                        })}
                       </div>
                     </>
                   )}

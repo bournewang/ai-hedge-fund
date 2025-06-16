@@ -6,6 +6,7 @@ import {
   Loader2
 } from 'lucide-react';
 import { useNodeContext } from '@/contexts/node-context';
+import { useLanguage } from '@/hooks/useLanguage';
 import { AnalysisProgressMatrix } from './AnalysisProgressMatrix';
 import { AnalysisResultsTable } from './AnalysisResultsTable';
 
@@ -17,6 +18,7 @@ interface AnalysisResultsProps {
 
 export function AnalysisResults({ selectedAgents, tickers, isAnalyzing }: AnalysisResultsProps) {
   const { agentNodeData, outputNodeData } = useNodeContext();
+  const { t } = useLanguage();
 
   // 计算分析进度
   const getAnalysisProgress = () => {
@@ -116,18 +118,18 @@ export function AnalysisResults({ selectedAgents, tickers, isAnalyzing }: Analys
             <div>
               <CardTitle className="flex items-center gap-2">
                 <BarChart3 className="h-5 w-5 text-orange-600 dark:text-orange-400" />
-                分析进度总览
+                {t('analysisResults.title')}
               </CardTitle>
               <CardDescription>
-                {isComplete ? '分析已完成' : 
-                 isProcessingResults ? '正在处理分析结果...' :
-                 `正在分析 ${tickers.length} 只股票，使用 ${selectedAgents.length} 位投资大师`}
+                {isComplete ? t('analysisResults.completed') : 
+                 isProcessingResults ? t('analysisResults.processing') :
+                 t('analysisResults.analyzing', { stocks: tickers.length, masters: selectedAgents.length })}
               </CardDescription>
             </div>
             {isComplete && outputNodeData && (
               <Button variant="outline" size="sm" onClick={handleExportResults}>
                 <Download className="h-4 w-4 mr-2" />
-                导出结果
+                {t('analysisResults.exportResults')}
               </Button>
             )}
           </div>
@@ -144,12 +146,12 @@ export function AnalysisResults({ selectedAgents, tickers, isAnalyzing }: Analys
 
             {/* 进度统计 */}
             <div className="flex justify-between items-center text-sm text-gray-600 dark:text-gray-400">
-              <span className="font-medium">总进度: {progress}%</span>
+              <span className="font-medium">{t('analysisResults.totalProgress', { progress })}</span>
               <div className="flex gap-4">
-                <span className="text-green-600 dark:text-green-400">完成: {stats.completed}</span>
-                <span className="text-blue-600 dark:text-blue-400">进行中: {stats.inProgress}</span>
-                <span className="text-gray-500 dark:text-gray-400">等待中: {stats.idle}</span>
-                {stats.error > 0 && <span className="text-red-600 dark:text-red-400">错误: {stats.error}</span>}
+                <span className="text-green-600 dark:text-green-400">{t('analysisResults.statusCompleted', { count: stats.completed })}</span>
+                <span className="text-blue-600 dark:text-blue-400">{t('analysisResults.statusInProgress', { count: stats.inProgress })}</span>
+                <span className="text-gray-500 dark:text-gray-400">{t('analysisResults.statusWaiting', { count: stats.idle })}</span>
+                {stats.error > 0 && <span className="text-red-600 dark:text-red-400">{t('analysisResults.statusError', { count: stats.error })}</span>}
               </div>
             </div>
 
@@ -158,8 +160,8 @@ export function AnalysisResults({ selectedAgents, tickers, isAnalyzing }: Analys
               <div className="flex items-center justify-center gap-3 p-6 bg-orange-50 dark:bg-orange-950/30 rounded-lg border border-orange-200 dark:border-orange-800">
                 <Loader2 className="h-5 w-5 text-orange-600 dark:text-orange-400 animate-spin" />
                 <div className="text-center">
-                  <div className="font-medium text-orange-800 dark:text-orange-200">正在处理分析结果</div>
-                  <div className="text-sm text-orange-600 dark:text-orange-400">所有投资大师已完成分析，正在汇总投资建议...</div>
+                  <div className="font-medium text-orange-800 dark:text-orange-200">{t('analysisResults.processingTitle')}</div>
+                  <div className="text-sm text-orange-600 dark:text-orange-400">{t('analysisResults.processingDescription')}</div>
                 </div>
               </div>
             )}

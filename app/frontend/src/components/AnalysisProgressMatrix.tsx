@@ -10,6 +10,7 @@ import {
   BarChart3
 } from 'lucide-react';
 import { agents, type AgentItem } from '@/data/agents';
+import { useLanguage } from '@/hooks/useLanguage';
 
 interface AgentNodeData {
   status?: 'IDLE' | 'IN_PROGRESS' | 'COMPLETE' | 'ERROR';
@@ -31,6 +32,7 @@ export function AnalysisProgressMatrix({
   onCellClick 
 }: AnalysisProgressMatrixProps) {
   const [selectedCell, setSelectedCell] = useState<{agent: string, ticker: string} | null>(null);
+  const { t } = useLanguage();
 
   // Get agent info
   const getAgentInfo = (agentKey: string): AgentItem | null => {
@@ -63,25 +65,25 @@ export function AnalysisProgressMatrix({
         return {
           icon: <CheckCircle2 className="h-4 w-4 text-green-600 dark:text-green-400" />,
           bgColor: 'bg-green-100 dark:bg-green-950/30 border-green-300 dark:border-green-700',
-          label: '完成'
+          label: t('analysisProgressMatrix.statusComplete')
         };
       case 'IN_PROGRESS':
         return {
           icon: <Loader2 className="h-4 w-4 text-blue-600 dark:text-blue-400 animate-spin" />,
           bgColor: 'bg-blue-100 dark:bg-blue-950/30 border-blue-300 dark:border-blue-700',
-          label: '进行中'
+          label: t('analysisProgressMatrix.statusInProgress')
         };
       case 'ERROR':
         return {
           icon: <AlertCircle className="h-4 w-4 text-red-600 dark:text-red-400" />,
           bgColor: 'bg-red-100 dark:bg-red-950/30 border-red-300 dark:border-red-700',
-          label: '错误'
+          label: t('analysisProgressMatrix.statusError')
         };
       default:
         return {
           icon: <Clock className="h-4 w-4 text-gray-400 dark:text-gray-500" />,
           bgColor: 'bg-gray-50 dark:bg-gray-800/50 border-gray-200 dark:border-gray-600',
-          label: '等待'
+          label: t('analysisProgressMatrix.statusWaiting')
         };
     }
   };
@@ -99,7 +101,7 @@ export function AnalysisProgressMatrix({
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <BarChart3 className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-              分析进度矩阵
+{t('analysisProgressMatrix.title')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -107,7 +109,7 @@ export function AnalysisProgressMatrix({
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="w-32">投资大师</TableHead>
+                    <TableHead className="w-32">{t('analysisProgressMatrix.investmentMasters')}</TableHead>
                     {tickers.map(ticker => (
                       <TableHead key={ticker} className="text-center min-w-20">
                         <Badge variant="outline" className="font-mono">
@@ -171,7 +173,7 @@ export function AnalysisProgressMatrix({
         <Card className="border-l-4 border-l-purple-500 dark:border-l-purple-400">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-purple-600 dark:text-purple-400">
-              详细信息
+{t('analysisProgressMatrix.detailsTitle')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -191,12 +193,12 @@ export function AnalysisProgressMatrix({
                       </div>
                       
                       <div>
-                        <h4 className="font-medium text-foreground">股票代码</h4>
+                        <h4 className="font-medium text-foreground">{t('analysisProgressMatrix.stockCode')}</h4>
                         <Badge variant="outline" className="font-mono">{selectedCell.ticker}</Badge>
                       </div>
 
                       <div>
-                        <h4 className="font-medium text-foreground">状态</h4>
+                        <h4 className="font-medium text-foreground">{t('analysisProgressMatrix.status')}</h4>
                         <div className="flex items-center gap-2">
                           {statusDisplay.icon}
                           <span className="text-sm">{statusDisplay.label}</span>
@@ -205,7 +207,7 @@ export function AnalysisProgressMatrix({
 
                       {agentData?.message && (
                         <div>
-                          <h4 className="font-medium text-foreground">消息</h4>
+                          <h4 className="font-medium text-foreground">{t('analysisProgressMatrix.message')}</h4>
                           <p className="text-sm text-muted-foreground">{agentData.message}</p>
                         </div>
                       )}
@@ -214,7 +216,7 @@ export function AnalysisProgressMatrix({
                         <div className="p-3 bg-blue-50 dark:bg-blue-950/30 rounded-lg border border-blue-200 dark:border-blue-800">
                           <div className="flex items-center gap-2 text-blue-700 dark:text-blue-300">
                             <Loader2 className="h-4 w-4 animate-spin" />
-                            <span className="text-sm font-medium">正在分析 {selectedCell.ticker}</span>
+                            <span className="text-sm font-medium">{t('analysisProgressMatrix.analyzing', { ticker: selectedCell.ticker })}</span>
                           </div>
                         </div>
                       )}
@@ -225,7 +227,7 @@ export function AnalysisProgressMatrix({
             ) : (
               <div className="text-center text-muted-foreground py-8">
                 <BarChart3 className="h-12 w-12 mx-auto mb-3 opacity-50" />
-                <p>点击矩阵中的单元格查看详细信息</p>
+                <p>{t('analysisProgressMatrix.clickToView')}</p>
               </div>
             )}
           </CardContent>

@@ -9,6 +9,7 @@ import { agents, investmentStyles, getAgentsByCategory, type AgentItem } from '@
 import { useNodeContext } from '@/contexts/node-context';
 import { api } from '@/services/api';
 import { tickerSymbolsService } from '@/services/tickerSymbols';
+import { useLanguage } from '@/hooks/useLanguage';
 import { AnalysisResults } from './AnalysisResults';
 
 type InvestmentStyle = keyof typeof investmentStyles;
@@ -48,6 +49,7 @@ export function AnalysisForm({ onAnalysisStart }: AnalysisFormProps) {
   const [isLoadingSymbols, setIsLoadingSymbols] = useState(false);
   
   const nodeContext = useNodeContext();
+  const { t } = useLanguage();
 
   // Preload ticker symbols on component mount
   useEffect(() => {
@@ -293,7 +295,7 @@ export function AnalysisForm({ onAnalysisStart }: AnalysisFormProps) {
         {/* 页面标题和重置按钮 */}
         <div className="flex justify-between items-center">
           <div className="text-center space-y-2">
-            <p className="text-muted-foreground">17位世界顶级投资大师为您提供专业的股票分析</p>
+            <p className="text-muted-foreground">{t('header.subtitle')}</p>
           </div>
           {isAnalyzing && (
             <Button
@@ -302,7 +304,7 @@ export function AnalysisForm({ onAnalysisStart }: AnalysisFormProps) {
               onClick={handleReset}
             >
               <RotateCcw className="h-4 w-4" />
-              重新开始
+{t('common.reset')}
             </Button>
           )}
         </div>
@@ -315,13 +317,13 @@ export function AnalysisForm({ onAnalysisStart }: AnalysisFormProps) {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <TrendingUp className="h-5 w-5 text-green-600 dark:text-green-400" />
-                  步骤1: 选择要分析的股票
+                  {t('analysisForm.step1.title')}
                   {isLoadingSymbols && (
-                    <span className="text-xs text-muted-foreground">(加载股票数据中...)</span>
+                    <span className="text-xs text-muted-foreground">({t('analysisForm.step1.loadingSymbols')})</span>
                   )}
                 </CardTitle>
                 <CardDescription>
-                  输入股票代码，用逗号分隔。支持美股代码如 AAPL, MSFT, NVDA 等。现已支持实时搜索和验证！
+                  {t('analysisForm.step1.description')}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -332,7 +334,7 @@ export function AnalysisForm({ onAnalysisStart }: AnalysisFormProps) {
                       <div className="relative flex-1">
                         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                         <Input
-                          placeholder="搜索股票代码 (如: AAPL, MSFT)..."
+                          placeholder={t('analysisForm.step1.searchPlaceholder')}
                           value={tickerInput}
                           onChange={(e) => handleTickerInputChange(e.target.value)}
                           onKeyDown={handleTickerInputKeyDown}
@@ -377,7 +379,7 @@ export function AnalysisForm({ onAnalysisStart }: AnalysisFormProps) {
                           onClick={() => handleAddTicker(tickerInput.trim())}
                           className="px-3"
                         >
-                          添加
+{t('common.add')}
                         </Button>
                       )}
                     </div>
@@ -386,10 +388,10 @@ export function AnalysisForm({ onAnalysisStart }: AnalysisFormProps) {
                   {/* Original bulk input for backward compatibility */}
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-muted-foreground">
-                      或批量输入 (用逗号分隔):
+                      {t('analysisForm.step1.bulkInputLabel')}
                     </label>
                     <Input
-                      placeholder="请输入股票代码，如: AAPL,MSFT,NVDA..."
+                      placeholder={t('analysisForm.step1.bulkInputPlaceholder')}
                       value={tickers}
                       onChange={(e) => setTickers(e.target.value)}
                       className={`text-lg ${
@@ -407,7 +409,7 @@ export function AnalysisForm({ onAnalysisStart }: AnalysisFormProps) {
                     <div className="flex items-center gap-2 p-3 border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-950/30 rounded-lg">
                       <TrendingUp className="h-4 w-4 text-blue-600 dark:text-blue-400 flex-shrink-0" />
                       <div className="text-sm text-blue-700 dark:text-blue-300">
-                        <span className="font-medium">从趋势页面载入:</span> 已自动填入选中的热门股票
+<span className="font-medium">{t('analysisForm.step1.loadedFromTrends').split(':')[0]}:</span> {t('analysisForm.step1.loadedFromTrends').split(':')[1]}
                       </div>
                     </div>
                   )}
@@ -417,15 +419,14 @@ export function AnalysisForm({ onAnalysisStart }: AnalysisFormProps) {
                     <div className="flex items-center gap-2 p-3 border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-950/30 rounded-lg">
                       <AlertCircle className="h-4 w-4 text-red-600 dark:text-red-400 flex-shrink-0" />
                       <div className="text-sm text-red-700 dark:text-red-300">
-                        无效的股票代码: {tickerValidation.invalid.join(', ')}。
-                        请输入正确的美股代码 (如: AAPL, MSFT)
+{t('analysisForm.step1.invalidSymbols', { symbols: tickerValidation.invalid.join(', ') })}
                       </div>
                     </div>
                   )}
 
                   {tickerValidation.isValid && (
                     <div className="text-sm text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-950/30 p-2 rounded-lg border border-green-200 dark:border-green-800">
-                      ✓ 已选择 {tickerValidation.valid.length} 只股票: {tickerValidation.valid.join(', ')}
+{t('analysisForm.step1.validSymbols', { count: tickerValidation.valid.length, symbols: tickerValidation.valid.join(', ') })}
                     </div>
                   )}
                 </div>
@@ -433,7 +434,7 @@ export function AnalysisForm({ onAnalysisStart }: AnalysisFormProps) {
                 {/* 已选择的股票标签 */}
                 {tickerValidation.valid.length > 0 && (
                   <div className="space-y-2">
-                    <div className="text-sm font-medium text-foreground">已选择的股票:</div>
+                    <div className="text-sm font-medium text-foreground">{t('analysisForm.step1.selectedStocks')}</div>
                     <div className="flex flex-wrap gap-2">
                       {tickerValidation.valid.map(ticker => (
                         <Badge 
@@ -451,7 +452,7 @@ export function AnalysisForm({ onAnalysisStart }: AnalysisFormProps) {
 
                 {/* 热门股票推荐 */}
                 <div className="space-y-2">
-                  <div className="text-sm font-medium text-foreground">热门股票推荐:</div>
+                  <div className="text-sm font-medium text-foreground">{t('analysisForm.step1.popularRecommendations')}</div>
                   <div className="flex flex-wrap gap-2">
                     {POPULAR_STOCKS.map(stock => (
                       <Badge
@@ -474,15 +475,15 @@ export function AnalysisForm({ onAnalysisStart }: AnalysisFormProps) {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Users className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-                  步骤2: 选择投资风格
+                  {t('analysisForm.step2.title')}
                 </CardTitle>
                 <CardDescription>
-                  选择一种投资风格，我们会推荐相应的AI投资大师
+                  {t('analysisForm.step2.description')}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {Object.entries(investmentStyles).map(([key, style]) => (
+                  {Object.entries(investmentStyles).map(([key]) => (
                     <div
                       key={key}
                       className={`p-4 rounded-lg border-2 cursor-pointer transition-all ${
@@ -492,8 +493,8 @@ export function AnalysisForm({ onAnalysisStart }: AnalysisFormProps) {
                       }`}
                       onClick={() => handleStyleChange(key as InvestmentStyle | 'all')}
                     >
-                      <h3 className="font-semibold text-foreground">{style.name}</h3>
-                      <p className="text-sm text-muted-foreground">{style.description}</p>
+                      <h3 className="font-semibold text-foreground">{t(`investmentStyles.${key}.name`)}</h3>
+                      <p className="text-sm text-muted-foreground">{t(`investmentStyles.${key}.description`)}</p>
                     </div>
                   ))}
                 </div>
@@ -505,10 +506,10 @@ export function AnalysisForm({ onAnalysisStart }: AnalysisFormProps) {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <BarChart3 className="h-5 w-5 text-purple-600 dark:text-purple-400" />
-                  步骤3: 选择AI投资大师
+                  {t('analysisForm.step3.title')}
                 </CardTitle>
                 <CardDescription>
-                  选择想要参与分析的AI投资大师（建议选择3-5位）
+                  {t('analysisForm.step3.description')}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -545,21 +546,21 @@ export function AnalysisForm({ onAnalysisStart }: AnalysisFormProps) {
                   <div className="text-center space-y-6">
                     <div className="space-y-2">
                       <div className="text-xl font-bold text-orange-900 dark:text-orange-100">
-                        🚀 准备开始分析
-                      </div>
-                      <div className="text-lg text-orange-700 dark:text-orange-300">
-                        {tickerValidation.valid.length} 只股票 × {selectedAgents.length} 位投资大师
-                      </div>
+                                             {t('analysisForm.step4.title')}
+                    </div>
+                    <div className="text-lg text-orange-700 dark:text-orange-300">
+                      {tickerValidation.valid.length} stocks × {selectedAgents.length} investment masters
+                    </div>
                     </div>
                     
                     {/* 分析概要 */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                       <div className="bg-white/80 dark:bg-white/10 rounded-lg p-3 border border-blue-200 dark:border-blue-700">
-                        <div className="font-medium text-blue-800 dark:text-blue-300 mb-1">分析股票</div>
+                        <div className="font-medium text-blue-800 dark:text-blue-300 mb-1">{t('analysisForm.step4.stocksLabel')}</div>
                         <div className="text-blue-600 dark:text-blue-400 font-semibold">{tickerValidation.valid.join(', ')}</div>
                       </div>
                       <div className="bg-white/80 dark:bg-white/10 rounded-lg p-3 border border-purple-200 dark:border-purple-700">
-                        <div className="font-medium text-purple-800 dark:text-purple-300 mb-1">投资大师</div>
+                        <div className="font-medium text-purple-800 dark:text-purple-300 mb-1">{t('analysisForm.step4.mastersLabel')}</div>
                         <div className="text-purple-600 dark:text-purple-400 font-semibold">
                             {selectedAgents.map(agent => agents.find(a => a.key === agent)?.display_name).join(', ')} </div>
                       </div>
@@ -570,7 +571,7 @@ export function AnalysisForm({ onAnalysisStart }: AnalysisFormProps) {
                       <div className="flex items-center gap-2 p-3 border border-amber-300 dark:border-amber-700 bg-amber-100 dark:bg-amber-950/40 rounded-lg">
                         <AlertCircle className="h-4 w-4 text-amber-700 dark:text-amber-300 flex-shrink-0" />
                         <div className="text-sm text-amber-800 dark:text-amber-200">
-                          请输入有效的股票代码后再开始分析
+{t('analysisForm.step4.validationError')}
                         </div>
                       </div>
                     )}
@@ -584,12 +585,12 @@ export function AnalysisForm({ onAnalysisStart }: AnalysisFormProps) {
                       {isAnalyzing ? (
                         <>
                           <div className="animate-spin h-5 w-5 mr-3 border-2 border-white border-t-transparent rounded-full" />
-                          正在分析...
+{t('analysisForm.step4.analyzing')}
                         </>
                       ) : (
                         <>
                           <PlayCircle className="h-6 w-6 mr-3" />
-                          开始AI分析
+{t('analysisForm.step4.startAnalysis')}
                         </>
                       )}
                     </Button>
@@ -597,7 +598,10 @@ export function AnalysisForm({ onAnalysisStart }: AnalysisFormProps) {
                     {/* 预计时间提示 */}
                     {!isAnalyzing && (
                       <div className="text-xs text-gray-600 dark:text-gray-400 bg-white/60 dark:bg-white/10 px-3 py-1 rounded-full border border-gray-200 dark:border-gray-600">
-                        预计分析时间：{Math.ceil(tickerValidation.valid.length * selectedAgents.length * 0.5)} - {Math.ceil(tickerValidation.valid.length * selectedAgents.length * 1)} 分钟
+{t('analysisForm.step4.estimatedTime', { 
+                          min: Math.ceil(tickerValidation.valid.length * selectedAgents.length * 0.5),
+                          max: Math.ceil(tickerValidation.valid.length * selectedAgents.length * 1)
+                        })}
                       </div>
                     )}
                   </div>

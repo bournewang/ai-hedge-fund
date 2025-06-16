@@ -15,8 +15,10 @@ import {
   Loader2,
   Flame
 } from 'lucide-react';
+import { useLanguage } from '@/hooks/useLanguage';
 
 export function DashboardPage() {
+  const { t } = useLanguage();
   const [recentAnalyses, setRecentAnalyses] = useState<RecentAnalysis[]>([]);
   const [trendingStocks, setTrendingStocks] = useState<TrendingStock[]>([]);
   const [isLoadingAnalyses, setIsLoadingAnalyses] = useState(true);
@@ -201,23 +203,22 @@ export function DashboardPage() {
         <div className="max-w-6xl mx-auto px-4 py-16">
           <div className="text-center space-y-6">
             <h1 className="text-4xl md:text-6xl font-bold">
-              AI Hedge Fund Platform
+              {t('dashboard.hero.title')}
             </h1>
             <p className="text-xl md:text-2xl text-blue-100 max-w-3xl mx-auto">
-              Harness the wisdom of 17 legendary investors powered by artificial intelligence. 
-              Make smarter investment decisions with data-driven insights.
+              {t('dashboard.hero.subtitle')}
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-8">
               <Link to="/analysis">
                 <Button size="lg" className="bg-white text-blue-600 hover:bg-gray-100 dark:bg-gray-800 dark:text-blue-400 dark:hover:bg-gray-700 px-8 py-4 text-lg font-semibold">
                   <BarChart3 className="w-6 h-6 mr-2" />
-                  Start Analysis
+{t('dashboard.hero.startAnalysis')}
                 </Button>
               </Link>
               <Link to="/explore">
                 <Button size="lg" className="bg-white text-blue-600 hover:bg-gray-100 dark:bg-gray-800 dark:text-blue-400 dark:hover:bg-gray-700 px-8 py-4 text-lg font-semibold">
                     <TrendingUp className="w-6 h-6 mr-2" />
-                    Explore
+                    {t('dashboard.hero.explore')}
                 </Button>
               </Link>
             </div>
@@ -286,11 +287,11 @@ export function DashboardPage() {
               <CardTitle className="flex items-center justify-between">
                 <span className="flex items-center gap-2">
                   <Clock className="h-5 w-5 text-muted-foreground" />
-                  Recent Analyses
+{t('dashboard.recentAnalyses.title')}
                 </span>
                 <Link to="/recent-analyses">
                   <Button variant="ghost" size="sm">
-                    View All <ArrowRight className="w-4 h-4 ml-1" />
+{t('dashboard.recentAnalyses.viewAll')} <ArrowRight className="w-4 h-4 ml-1" />
                   </Button>
                 </Link>
               </CardTitle>
@@ -299,14 +300,14 @@ export function DashboardPage() {
               {isLoadingAnalyses ? (
                 <div className="flex items-center justify-center p-8">
                   <Loader2 className="h-6 w-6 animate-spin mr-2" />
-                  <span className="text-muted-foreground">Loading recent analyses...</span>
+                  <span className="text-muted-foreground">{t('dashboard.recentAnalyses.loading')}</span>
                 </div>
               ) : analysesError ? (
                 <div className="text-center p-4">
                   <p className="text-red-500 dark:text-red-400 text-sm mb-2">
-                    Failed to load recent analyses
+                    {t('dashboard.recentAnalyses.loadError')}
                   </p>
-                  <p className="text-xs text-muted-foreground">Showing fallback data</p>
+                  <p className="text-xs text-muted-foreground">{t('dashboard.recentAnalyses.fallbackData')}</p>
                 </div>
               ) : null}
               
@@ -319,7 +320,7 @@ export function DashboardPage() {
                         variant={analysis.signal === 'STRONG BUY' ? 'secondary' : 'outline'}
                         className={analysis.signal === 'STRONG BUY' ? 'bg-green-600 dark:bg-green-500 text-white' : 'bg-blue-600 dark:bg-blue-500 text-white'}
                       >
-                        {analysis.signal}
+{t(`signals.${analysis.signal}`)}
                       </Badge>
                     </div>
                     <div className="text-right">
@@ -346,11 +347,11 @@ export function DashboardPage() {
               <CardTitle className="flex items-center justify-between">
                 <span className="flex items-center gap-2">
                   <TrendingUp className="h-5 w-5 text-muted-foreground" />
-                  Trending Now
+{t('dashboard.trending.title')}
                 </span>
                 <Link to="/explore">
                   <Button variant="ghost" size="sm">
-                    Explore <ArrowRight className="w-4 h-4 ml-1" />
+{t('dashboard.trending.explore')} <ArrowRight className="w-4 h-4 ml-1" />
                   </Button>
                 </Link>
               </CardTitle>
@@ -359,14 +360,14 @@ export function DashboardPage() {
               {isLoadingTrending ? (
                 <div className="flex items-center justify-center p-8">
                   <Loader2 className="h-6 w-6 animate-spin mr-2" />
-                  <span className="text-muted-foreground">Loading trending stocks...</span>
+                  <span className="text-muted-foreground">{t('dashboard.trending.loading')}</span>
                 </div>
               ) : trendingError ? (
                 <div className="text-center p-4">
                   <p className="text-red-500 dark:text-red-400 text-sm mb-2">
-                    Failed to load trending stocks
+                    {t('dashboard.trending.loadError')}
                   </p>
-                  <p className="text-xs text-muted-foreground">Showing fallback data</p>
+                  <p className="text-xs text-muted-foreground">{t('dashboard.trending.fallbackData')}</p>
                 </div>
               ) : null}
               
@@ -378,7 +379,7 @@ export function DashboardPage() {
                         <div className="font-semibold text-foreground">{stock.symbol}</div>
                         {getTrendingIcon(stock.change_percent)}
                       </div>
-                      <div className="text-sm text-muted-foreground">Vol: {formatVolume(stock.volume)}</div>
+                      <div className="text-sm text-muted-foreground">{t('dashboard.trending.volume')}: {formatVolume(stock.volume)}</div>
                     </div>
                     <div className="text-right">
                       <div className="text-green-600 dark:text-green-400 font-medium">
@@ -400,10 +401,10 @@ export function DashboardPage() {
               <CardContent className="p-6">
                 <div className="space-y-3">
                   <TrendingUp className="h-8 w-8 text-primary" />
-                  <h3 className="font-semibold text-lg text-foreground">🔍 Explore</h3>
-                  <p className="text-muted-foreground text-sm">Discover trending stocks with buy signals from our AI analysts</p>
+                  <h3 className="font-semibold text-lg text-foreground">{t('dashboard.features.explore.title')}</h3>
+                  <p className="text-muted-foreground text-sm">{t('dashboard.features.explore.description')}</p>
                   <div className="flex items-center text-primary text-sm font-medium group-hover:gap-2 transition-all">
-                    Start Exploring <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
+                    {t('dashboard.features.explore.action')} <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
                   </div>
                 </div>
               </CardContent>
@@ -415,10 +416,10 @@ export function DashboardPage() {
               <CardContent className="p-6">
                 <div className="space-y-3">
                   <Clock className="h-8 w-8 text-primary" />
-                  <h3 className="font-semibold text-lg text-foreground">📊 Recent Analysis</h3>
-                  <p className="text-muted-foreground text-sm">View all your recent AI analysis results with performance tracking</p>
+                  <h3 className="font-semibold text-lg text-foreground">{t('dashboard.features.recentAnalysis.title')}</h3>
+                  <p className="text-muted-foreground text-sm">{t('dashboard.features.recentAnalysis.description')}</p>
                   <div className="flex items-center text-primary text-sm font-medium group-hover:gap-2 transition-all">
-                    View Analysis <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
+                    {t('dashboard.features.recentAnalysis.action')} <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
                   </div>
                 </div>
               </CardContent>
@@ -430,10 +431,10 @@ export function DashboardPage() {
               <CardContent className="p-6">
                 <div className="space-y-3">
                   <Gem className="h-8 w-8 text-primary" />
-                  <h3 className="font-semibold text-lg text-foreground">💎 Value Picks</h3>
-                  <p className="text-muted-foreground text-sm">Uncover undervalued gems using our expert value investing algorithms</p>
+                  <h3 className="font-semibold text-lg text-foreground">{t('dashboard.features.valuePicks.title')}</h3>
+                  <p className="text-muted-foreground text-sm">{t('dashboard.features.valuePicks.description')}</p>
                   <div className="flex items-center text-primary text-sm font-medium group-hover:gap-2 transition-all">
-                    Find Value <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
+                    {t('dashboard.features.valuePicks.action')} <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
                   </div>
                 </div>
               </CardContent>
@@ -445,10 +446,10 @@ export function DashboardPage() {
               <CardContent className="p-6">
                 <div className="space-y-3">
                   <Users className="h-8 w-8 text-primary" />
-                  <h3 className="font-semibold text-lg text-foreground">🤖 AI Agents</h3>
-                  <p className="text-muted-foreground text-sm">Learn about our 17 legendary investor AI personalities and their strategies</p>
+                  <h3 className="font-semibold text-lg text-foreground">{t('dashboard.features.aiAgents.title')}</h3>
+                  <p className="text-muted-foreground text-sm">{t('dashboard.features.aiAgents.description')}</p>
                   <div className="flex items-center text-primary text-sm font-medium group-hover:gap-2 transition-all">
-                    Meet Agents <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
+                    {t('dashboard.features.aiAgents.action')} <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
                   </div>
                 </div>
               </CardContent>
@@ -460,10 +461,10 @@ export function DashboardPage() {
               <CardContent className="p-6">
                 <div className="space-y-3">
                   <BarChart3 className="h-8 w-8 text-primary" />
-                  <h3 className="font-semibold text-lg text-foreground">⚡ Analysis Now</h3>
-                  <p className="text-muted-foreground text-sm">Start analyzing stocks immediately with our AI-powered investment insights</p>
+                  <h3 className="font-semibold text-lg text-foreground">{t('dashboard.features.analysisNow.title')}</h3>
+                  <p className="text-muted-foreground text-sm">{t('dashboard.features.analysisNow.description')}</p>
                   <div className="flex items-center text-primary text-sm font-medium group-hover:gap-2 transition-all">
-                    Analyze Now <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
+                    {t('dashboard.features.analysisNow.action')} <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
                   </div>
                 </div>
               </CardContent>
@@ -474,14 +475,14 @@ export function DashboardPage() {
         {/* Call to Action */}
         <Card className="bg-gradient-to-r from-blue-600 to-purple-600 text-white">
           <CardContent className="p-8 text-center">
-            <h2 className="text-2xl font-bold mb-4">Ready to Make Smarter Investments?</h2>
+            <h2 className="text-2xl font-bold mb-4">{t('dashboard.cta.title')}</h2>
             <p className="text-blue-100 mb-6 max-w-2xl mx-auto">
-              Join thousands of investors who trust our AI-powered platform for data-driven investment decisions.
+              {t('dashboard.cta.subtitle')}
             </p>
             <Link to="/analysis">
               <Button size="lg" className="bg-white text-blue-600 hover:bg-gray-100 dark:bg-gray-800 dark:text-blue-400 dark:hover:bg-gray-700 px-8 py-4 text-lg font-semibold">
                 <BarChart3 className="w-6 h-6 mr-2" />
-                Start Your First Analysis
+{t('dashboard.cta.action')}
               </Button>
             </Link>
           </CardContent>
