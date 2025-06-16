@@ -4,10 +4,11 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { CheckCircle2, PlayCircle, TrendingUp, Users, BarChart3, RotateCcw, AlertCircle, X } from 'lucide-react';
+import { CheckCircle2, PlayCircle, TrendingUp, Users, BarChart3, RotateCcw, AlertCircle, X, Search } from 'lucide-react';
 import { agents, investmentStyles, getAgentsByCategory, type AgentItem } from '@/data/agents';
 import { useNodeContext } from '@/contexts/node-context';
 import { api } from '@/services/api';
+import { tickerSymbolsService } from '@/services/tickerSymbols';
 import { AnalysisResults } from './AnalysisResults';
 
 type InvestmentStyle = keyof typeof investmentStyles;
@@ -30,11 +31,7 @@ const POPULAR_STOCKS = [
   { symbol: 'V', name: 'Visa' },
 ];
 
-// 股票代码验证函数
-const validateTicker = (ticker: string): boolean => {
-  // 基本的股票代码格式验证：1-5个字母，可能包含点
-  return /^[A-Z]{1,5}(\.[A-Z])?$/.test(ticker.trim().toUpperCase());
-};
+
 
 export function AnalysisForm({ onAnalysisStart }: AnalysisFormProps) {
   const [searchParams] = useSearchParams();
@@ -42,7 +39,32 @@ export function AnalysisForm({ onAnalysisStart }: AnalysisFormProps) {
   const [selectedStyle, setSelectedStyle] = useState<InvestmentStyle | 'all'>('all');
   const [selectedAgents, setSelectedAgents] = useState<string[]>([]);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  
+  // New state for ticker autocomplete
+  const [tickerInput, setTickerInput] = useState<string>('');
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState<number>(-1);
+  const [isLoadingSymbols, setIsLoadingSymbols] = useState(false);
+  
   const nodeContext = useNodeContext();
+
+  // Preload ticker symbols on component mount
+  useEffect(() => {
+    const preloadSymbols = async () => {
+      setIsLoadingSymbols(true);
+      try {
+        await tickerSymbolsService.preloadSymbols();
+        console.log('✅ Ticker symbols preloaded');
+      } catch (error) {
+        console.error('⚠️  Failed to preload ticker symbols:', error);
+      } finally {
+        setIsLoadingSymbols(false);
+      }
+    };
+    
+    preloadSymbols();
+  }, []);
 
   // Parse tickers from URL parameters on component mount
   useEffect(() => {
@@ -63,15 +85,17 @@ export function AnalysisForm({ onAnalysisStart }: AnalysisFormProps) {
     }
   }, [searchParams]);
 
-  // 验证股票代码
+  // Enhanced ticker validation using real symbols
   const tickerValidation = useMemo(() => {
     const tickerList = tickers.split(',').map(t => t.trim()).filter(Boolean);
     const validTickers: string[] = [];
     const invalidTickers: string[] = [];
     
     tickerList.forEach(ticker => {
-      if (validateTicker(ticker)) {
-        validTickers.push(ticker.toUpperCase());
+      const upperTicker = ticker.toUpperCase();
+      // Basic format validation first
+      if (/^[A-Z]{1,5}(\.[A-Z])?$/.test(upperTicker)) {
+        validTickers.push(upperTicker);
       } else {
         invalidTickers.push(ticker);
       }
@@ -84,6 +108,85 @@ export function AnalysisForm({ onAnalysisStart }: AnalysisFormProps) {
       isEmpty: tickerList.length === 0
     };
   }, [tickers]);
+
+  // Handle ticker input changes and search suggestions
+  const handleTickerInputChange = useCallback(async (value: string) => {
+    setTickerInput(value);
+    setSelectedSuggestionIndex(-1); // Reset selection when typing
+    
+    if (value.length >= 1) {
+      try {
+        const searchResults = await tickerSymbolsService.searchTickers(value, 8);
+        setSuggestions(searchResults);
+        setShowSuggestions(searchResults.length > 0);
+      } catch (error) {
+        console.error('Error searching tickers:', error);
+        setSuggestions([]);
+        setShowSuggestions(false);
+      }
+    } else {
+      setSuggestions([]);
+      setShowSuggestions(false);
+    }
+  }, []);
+
+  // Add ticker from suggestion or input
+  const handleAddTicker = useCallback((symbol: string) => {
+    const upperSymbol = symbol.toUpperCase();
+    const currentTickers = tickers.split(',').map(t => t.trim().toUpperCase()).filter(Boolean);
+    
+    if (!currentTickers.includes(upperSymbol)) {
+      setTickers(prev => prev ? `${prev},${upperSymbol}` : upperSymbol);
+    }
+    
+    setTickerInput('');
+    setShowSuggestions(false);
+  }, [tickers]);
+
+  // Handle keyboard navigation in ticker input
+  const handleTickerInputKeyDown = useCallback((e: React.KeyboardEvent) => {
+    if (!showSuggestions || suggestions.length === 0) {
+      // No suggestions showing, handle normal Enter
+      if (e.key === 'Enter' && tickerInput.trim()) {
+        e.preventDefault();
+        handleAddTicker(tickerInput.trim());
+      }
+      return;
+    }
+
+    switch (e.key) {
+      case 'ArrowDown':
+        e.preventDefault();
+        setSelectedSuggestionIndex(prev => 
+          prev < suggestions.length - 1 ? prev + 1 : 0
+        );
+        break;
+      
+      case 'ArrowUp':
+        e.preventDefault();
+        setSelectedSuggestionIndex(prev => 
+          prev > 0 ? prev - 1 : suggestions.length - 1
+        );
+        break;
+      
+      case 'Enter':
+        e.preventDefault();
+        if (selectedSuggestionIndex >= 0 && selectedSuggestionIndex < suggestions.length) {
+          // Select highlighted suggestion
+          handleAddTicker(suggestions[selectedSuggestionIndex]);
+        } else if (tickerInput.trim()) {
+          // No selection, add typed text
+          handleAddTicker(tickerInput.trim());
+        }
+        break;
+      
+      case 'Escape':
+        e.preventDefault();
+        setShowSuggestions(false);
+        setSelectedSuggestionIndex(-1);
+        break;
+    }
+  }, [showSuggestions, suggestions, selectedSuggestionIndex, tickerInput, handleAddTicker]);
 
   // 根据投资风格获取推荐的代理
   const getRecommendedAgents = useCallback((style: InvestmentStyle | 'all'): AgentItem[] => {
@@ -138,6 +241,10 @@ export function AnalysisForm({ onAnalysisStart }: AnalysisFormProps) {
     setTickers('AAPL,MSFT,NVDA');
     setSelectedAgents([]);
     setSelectedStyle('all');
+    setTickerInput('');
+    setShowSuggestions(false);
+    setSuggestions([]);
+    setSelectedSuggestionIndex(-1);
     // 重置为默认推荐的代理
     const recommended = getRecommendedAgents('all');
     setSelectedAgents(recommended.map(agent => agent.key));
@@ -209,25 +316,91 @@ export function AnalysisForm({ onAnalysisStart }: AnalysisFormProps) {
                 <CardTitle className="flex items-center gap-2">
                   <TrendingUp className="h-5 w-5 text-green-600 dark:text-green-400" />
                   步骤1: 选择要分析的股票
+                  {isLoadingSymbols && (
+                    <span className="text-xs text-muted-foreground">(加载股票数据中...)</span>
+                  )}
                 </CardTitle>
                 <CardDescription>
-                  输入股票代码，用逗号分隔。支持美股代码如 AAPL, MSFT, NVDA 等
+                  输入股票代码，用逗号分隔。支持美股代码如 AAPL, MSFT, NVDA 等。现已支持实时搜索和验证！
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
+                {/* Enhanced ticker input with autocomplete */}
                 <div className="space-y-2">
-                  <Input
-                    placeholder="请输入股票代码，如: AAPL,MSFT,NVDA..."
-                    value={tickers}
-                    onChange={(e) => setTickers(e.target.value)}
-                    className={`text-lg ${
-                      !tickerValidation.isEmpty && !tickerValidation.isValid 
-                        ? 'border-red-300 focus:border-red-500 dark:border-red-600 dark:focus:border-red-400' 
-                        : tickerValidation.isValid 
-                        ? 'border-green-300 focus:border-green-500 dark:border-green-600 dark:focus:border-green-400'
-                        : ''
-                    }`}
-                  />
+                  <div className="relative">
+                    <div className="flex gap-2">
+                      <div className="relative flex-1">
+                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                        <Input
+                          placeholder="搜索股票代码 (如: AAPL, MSFT)..."
+                          value={tickerInput}
+                          onChange={(e) => handleTickerInputChange(e.target.value)}
+                          onKeyDown={handleTickerInputKeyDown}
+                          onFocus={() => {
+                            if (tickerInput.length >= 1 && suggestions.length > 0) {
+                              setShowSuggestions(true);
+                              setSelectedSuggestionIndex(-1);
+                            }
+                          }}
+                          onBlur={() => setTimeout(() => {
+                            setShowSuggestions(false);
+                            setSelectedSuggestionIndex(-1);
+                          }, 200)}
+                          className="pl-10"
+                        />
+                        
+                        {/* Autocomplete suggestions */}
+                        {showSuggestions && suggestions.length > 0 && (
+                          <div className="absolute top-full left-0 right-0 z-50 mt-1 bg-background border border-border rounded-md shadow-lg max-h-48 overflow-y-auto">
+                            {suggestions.map((symbol, index) => (
+                              <div
+                                key={symbol}
+                                className={`px-3 py-2 cursor-pointer text-sm transition-colors ${
+                                  index === selectedSuggestionIndex
+                                    ? 'bg-primary text-primary-foreground'
+                                    : 'hover:bg-muted'
+                                }`}
+                                onClick={() => handleAddTicker(symbol)}
+                                onMouseEnter={() => setSelectedSuggestionIndex(index)}
+                              >
+                                <span className="font-medium">{symbol}</span>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                      
+                      {tickerInput.trim() && (
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={() => handleAddTicker(tickerInput.trim())}
+                          className="px-3"
+                        >
+                          添加
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Original bulk input for backward compatibility */}
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-muted-foreground">
+                      或批量输入 (用逗号分隔):
+                    </label>
+                    <Input
+                      placeholder="请输入股票代码，如: AAPL,MSFT,NVDA..."
+                      value={tickers}
+                      onChange={(e) => setTickers(e.target.value)}
+                      className={`text-lg ${
+                        !tickerValidation.isEmpty && !tickerValidation.isValid 
+                          ? 'border-red-300 focus:border-red-500 dark:border-red-600 dark:focus:border-red-400' 
+                          : tickerValidation.isValid 
+                          ? 'border-green-300 focus:border-green-500 dark:border-green-600 dark:focus:border-green-400'
+                          : ''
+                      }`}
+                    />
+                  </div>
                   
                   {/* URL Tickers Loaded Indicator */}
                   {searchParams.get('tickers') && (

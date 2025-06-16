@@ -138,6 +138,23 @@ class Cache:
         if "recent_analyses" in self._cache:
             del self._cache["recent_analyses"]
 
+    # Ticker symbols cache methods
+    def get_ticker_symbols(self) -> Optional[List[str]]:
+        """Get cached ticker symbols list."""
+        return self._cache.get("ticker_symbols")
+
+    def set_ticker_symbols(self, symbols: List[str]):
+        """Cache ticker symbols list with 24-hour TTL."""
+        # Cache for 24 hours (86400 seconds)
+        self._cache.set("ticker_symbols", symbols, expire=86400)
+        print(f"📋 Cached {len(symbols)} ticker symbols for 24 hours")
+
+    def clear_ticker_symbols(self):
+        """Clear cached ticker symbols."""
+        if "ticker_symbols" in self._cache:
+            del self._cache["ticker_symbols"]
+            print("🗑️  Cleared ticker symbols cache")
+
     # Cache management methods
     def get_cache_stats(self) -> Dict[str, int]:
         """Get cache statistics for monitoring performance."""
@@ -152,6 +169,7 @@ class Cache:
             "llm_responses_cached": 0,
             "trending_stocks_cached": 0,
             "recent_analyses_cached": 0,
+            "ticker_symbols_cached": 0,
             "total_cache_entries": len(self._cache)
         }
         
@@ -175,6 +193,8 @@ class Cache:
                 stats["trending_stocks_cached"] += 1
             elif key == "recent_analyses":
                 stats["recent_analyses_cached"] += 1
+            elif key == "ticker_symbols":
+                stats["ticker_symbols_cached"] += 1
         
         return stats
 

@@ -113,10 +113,12 @@ export const api = {
       // Function to process the stream
       const processStream = async () => {
         try {
-          while (true) {
+          let reading = true;
+          while (reading) {
             const { done, value } = await reader.read();
             
             if (done) {
+              reading = false;
               break;
             }
             
@@ -194,8 +196,8 @@ export const api = {
               }
             }
           }
-        } catch (error: any) { // Type assertion for error
-          if (error.name !== 'AbortError') {
+        } catch (error: unknown) {
+          if (error instanceof Error && error.name !== 'AbortError') {
             console.error('Error reading SSE stream:', error);
             // Mark all agents as error when there's a connection error
             const agentIds = params.selected_agents || [];
@@ -207,8 +209,8 @@ export const api = {
       // Start processing the stream
       processStream();
     })
-    .catch((error: any) => { // Type assertion for error
-      if (error.name !== 'AbortError') {
+    .catch((error: unknown) => {
+      if (error instanceof Error && error.name !== 'AbortError') {
         console.error('SSE connection error:', error);
         // Mark all agents as error when there's a connection error
         const agentIds = params.selected_agents || [];
@@ -278,6 +280,61 @@ export const api = {
       return result.data;
     } catch (error) {
       console.error('Error fetching recent analyses:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Fetch all ticker symbols for caching
+   */
+  getTickerSymbols: async (forceRefresh: boolean = false): Promise<string[]> => {
+    try {
+      const url = `${API_BASE_URL}/ticker-symbols/${forceRefresh ? '?force_refresh=true' : ''}`;
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return await response.json();
+    } catch (error) {
+      console.error('Error fetching ticker symbols:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Fetch popular ticker symbols (fallback)
+   */
+  getPopularTickerSymbols: async (): Promise<string[]> => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/ticker-symbols/popular`);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return await response.json();
+    } catch (error) {
+      console.error('Error fetching popular ticker symbols:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Get ticker symbols cache statistics
+   */
+  getTickerSymbolsStats: async (): Promise<{
+    cached: boolean;
+    count: number;
+    sample: string[];
+    cache_size_kb: number;
+    last_updated: string;
+  }> => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/ticker-symbols/stats`);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return await response.json();
+    } catch (error) {
+      console.error('Error fetching ticker symbols stats:', error);
       throw error;
     }
   },

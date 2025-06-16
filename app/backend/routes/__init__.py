@@ -5,6 +5,7 @@ from app.backend.routes.health import router as health_router
 from app.backend.routes.cache import router as cache_router
 from app.backend.routes.explore import router as explore_router
 from app.backend.routes.recent_analysis import router as recent_analysis_router
+from app.backend.routes.ticker_symbols import router as ticker_symbols_router
 
 # Main API router
 api_router = APIRouter()
@@ -15,3 +16,4 @@ api_router.include_router(hedge_fund_router, tags=["hedge-fund"])
 api_router.include_router(cache_router, tags=["cache"])
 api_router.include_router(explore_router, tags=["explore"])
 api_router.include_router(recent_analysis_router, tags=["recent-analyses"])
+api_router.include_router(ticker_symbols_router, tags=["ticker-symbols"])
