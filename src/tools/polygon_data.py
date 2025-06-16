@@ -915,4 +915,325 @@ def _map_transaction_type(code: Optional[str]) -> str:
         "Z": "Deposit/Withdrawal of Shares"
     }
     
-    return transaction_mapping.get(code.upper(), f"Code {code}") 
+    return transaction_mapping.get(code.upper(), f"Code {code}")
+
+
+def get_day_gainers(count: int = 10) -> List[Dict[str, Any]]:
+    """
+    Fetch day gainers using Polygon.io's Grouped Daily endpoint.
+    
+    Args:
+        count: Number of gainers to return (default: 10, max: 50)
+    
+    Returns:
+        List of dictionaries containing stock data compatible with TrendingStock format
+    """
+    from datetime import datetime
+    current_date = datetime.now().strftime('%Y-%m-%d')
+    cache_key = f"polygon_day_gainers_{count}_{current_date}"
+    
+    # Check cache first  
+    if cached_data := _cache.get_trending_stocks(cache_key):
+        logger.info(f"Cache HIT for polygon_day_gainers: {cache_key}")
+        return cached_data
+
+    logger.info(f"Cache MISS for polygon_day_gainers: {cache_key}")
+    
+    try:
+        _rate_limit()
+        
+        import requests
+        from datetime import datetime, timedelta
+        
+        # Get the most recent trading day (excluding weekends)
+        today = datetime.now()
+        days_back = 1
+        while days_back <= 7:  # Look back up to a week for trading day
+            check_date = today - timedelta(days=days_back)
+            # Skip weekends
+            if check_date.weekday() < 5:  # Monday = 0, Friday = 4
+                trading_date = check_date.strftime('%Y-%m-%d')
+                break
+            days_back += 1
+        else:
+            # Fallback to yesterday if no trading day found
+            trading_date = (today - timedelta(days=1)).strftime('%Y-%m-%d')
+        
+        # Use Polygon's grouped daily endpoint for market data
+        url = f"https://api.polygon.io/v2/aggs/grouped/locale/us/market/stocks/{trading_date}"
+        params = {
+            "adjusted": "true",
+            "apikey": POLYGON_API_KEY
+        }
+        
+        response = requests.get(url, params=params)
+        if response.status_code != 200:
+            logger.error(f"Polygon grouped daily API error: {response.status_code} - {response.text}")
+            return []
+        
+        data = response.json()
+        
+        if not data.get('results'):
+            logger.warning(f"No results from Polygon grouped daily for {trading_date}")
+            return []
+        
+        logger.info(f"Processing {len(data['results'])} stocks from Polygon for {trading_date}")
+        
+        # Filter and sort by percent change to get gainers
+        gainers = []
+        for result in data['results']:
+            try:
+                # Get price data
+                open_price = result.get('o', 0)
+                close_price = result.get('c', 0)
+                high_price = result.get('h', 0)
+                low_price = result.get('l', 0)
+                volume = result.get('v', 0)
+                ticker = result.get('T', '')
+                
+                if open_price > 0 and close_price > 0:
+                    change = close_price - open_price
+                    change_percent = (change / open_price) * 100
+                    
+                    # Only include gainers with significant movement (> 2%) and decent volume
+                    if change_percent > 2.0 and volume > 100000:
+                        # Filter out non-standard tickers (options, warrants, etc.)
+                        if len(ticker) <= 5 and ticker.isalpha() and ticker.isupper():
+                            stock_data = {
+                                "symbol": ticker,
+                                "company_name": ticker,  # Will try to enhance later
+                                "price": float(close_price),
+                                "change": float(change),
+                                "change_percent": float(change_percent),
+                                "volume": int(volume),
+                                "market_cap": 0,  # Will be enhanced if available
+                                "sector": None,
+                                "exchange": "US",
+                                "fifty_two_week_high": float(high_price),
+                                "fifty_two_week_low": float(low_price),
+                                "pe_ratio": None,
+                                "book_value": None
+                            }
+                            gainers.append(stock_data)
+                        
+            except (ValueError, TypeError, KeyError) as e:
+                logger.warning(f"Error processing ticker data: {e}")
+                continue
+        
+        # Sort by percent change (highest first) and limit count
+        gainers.sort(key=lambda x: x['change_percent'], reverse=True)
+        top_gainers = gainers[:min(count, 50)]
+        
+        logger.info(f"Found {len(top_gainers)} gainers after filtering and sorting")
+        
+        # Cache the results for 24 hours with date in key for daily invalidation
+        _cache.set_trending_stocks(cache_key, top_gainers)
+        logger.info(f"Cached polygon_day_gainers for: {cache_key}, got {len(top_gainers)} gainers")
+        
+        return top_gainers
+        
+    except Exception as e:
+        logger.error(f"Error fetching Polygon.io day gainers: {e}")
+        return []
+
+
+def get_day_losers(count: int = 10) -> List[Dict[str, Any]]:
+    """
+    Fetch day losers using Polygon.io's Grouped Daily endpoint.
+    
+    Args:
+        count: Number of losers to return (default: 10, max: 50)
+    
+    Returns:
+        List of dictionaries containing stock data compatible with TrendingStock format
+    """
+    from datetime import datetime
+    current_date = datetime.now().strftime('%Y-%m-%d')
+    cache_key = f"polygon_day_losers_{count}_{current_date}"
+    
+    # Check cache first  
+    if cached_data := _cache.get_trending_stocks(cache_key):
+        logger.info(f"Cache HIT for polygon_day_losers: {cache_key}")
+        return cached_data
+
+    logger.info(f"Cache MISS for polygon_day_losers: {cache_key}")
+    
+    try:
+        _rate_limit()
+        
+        import requests
+        from datetime import datetime, timedelta
+        
+        # Get the most recent trading day (excluding weekends)
+        today = datetime.now()
+        days_back = 1
+        while days_back <= 7:  # Look back up to a week for trading day
+            check_date = today - timedelta(days=days_back)
+            # Skip weekends
+            if check_date.weekday() < 5:  # Monday = 0, Friday = 4
+                trading_date = check_date.strftime('%Y-%m-%d')
+                break
+            days_back += 1
+        else:
+            # Fallback to yesterday if no trading day found
+            trading_date = (today - timedelta(days=1)).strftime('%Y-%m-%d')
+        
+        # Use Polygon's grouped daily endpoint for market data
+        url = f"https://api.polygon.io/v2/aggs/grouped/locale/us/market/stocks/{trading_date}"
+        params = {
+            "adjusted": "true",
+            "apikey": POLYGON_API_KEY
+        }
+        
+        response = requests.get(url, params=params)
+        if response.status_code != 200:
+            logger.error(f"Polygon grouped daily API error: {response.status_code} - {response.text}")
+            return []
+        
+        data = response.json()
+        
+        if not data.get('results'):
+            logger.warning(f"No results from Polygon grouped daily for {trading_date}")
+            return []
+        
+        logger.info(f"Processing {len(data['results'])} stocks from Polygon for {trading_date}")
+        
+        # Filter and sort by percent change to get losers (negative change)
+        losers = []
+        for result in data['results']:
+            try:
+                # Get price data
+                open_price = result.get('o', 0)
+                close_price = result.get('c', 0)
+                high_price = result.get('h', 0)
+                low_price = result.get('l', 0)
+                volume = result.get('v', 0)
+                ticker = result.get('T', '')
+                
+                if open_price > 0 and close_price > 0:
+                    change = close_price - open_price
+                    change_percent = (change / open_price) * 100
+                    
+                    # Only include losers with significant movement (< -2%) and decent volume
+                    if change_percent < -2.0 and volume > 100000:
+                        # Filter out non-standard tickers (options, warrants, etc.)
+                        if len(ticker) <= 5 and ticker.isalpha() and ticker.isupper():
+                            stock_data = {
+                                "symbol": ticker,
+                                "company_name": ticker,  # Will try to enhance later
+                                "price": float(close_price),
+                                "change": float(change),
+                                "change_percent": float(change_percent),
+                                "volume": int(volume),
+                                "market_cap": 0,  # Will be enhanced if available
+                                "sector": None,
+                                "exchange": "US",
+                                "fifty_two_week_high": float(high_price),
+                                "fifty_two_week_low": float(low_price),
+                                "pe_ratio": None,
+                                "book_value": None
+                            }
+                            losers.append(stock_data)
+                        
+            except (ValueError, TypeError, KeyError) as e:
+                logger.warning(f"Error processing ticker data: {e}")
+                continue
+        
+        # Sort by percent change (lowest first) and limit count
+        losers.sort(key=lambda x: x['change_percent'])
+        top_losers = losers[:min(count, 50)]
+        
+        logger.info(f"Found {len(top_losers)} losers after filtering and sorting")
+        
+        # Cache the results for 24 hours with date in key for daily invalidation
+        _cache.set_trending_stocks(cache_key, top_losers)
+        logger.info(f"Cached polygon_day_losers for: {cache_key}, got {len(top_losers)} losers")
+        
+        return top_losers
+        
+    except Exception as e:
+        logger.error(f"Error fetching Polygon.io day losers: {e}")
+        return []
+
+
+def format_market_cap(market_cap: int) -> str:
+    """Format market cap into human readable string."""
+    if market_cap >= 1_000_000_000_000:  # Trillion
+        return f"${market_cap / 1_000_000_000_000:.1f}T"
+    elif market_cap >= 1_000_000_000:  # Billion
+        return f"${market_cap / 1_000_000_000:.1f}B"
+    elif market_cap >= 1_000_000:  # Million
+        return f"${market_cap / 1_000_000:.1f}M"
+    else:
+        return f"${market_cap:,}" if market_cap > 0 else "N/A"
+
+
+def get_trending_data() -> Dict[str, Any]:
+    """
+    Get comprehensive trending data for the explore page using Polygon.io.
+    
+    Returns:
+        Dictionary containing gainers, losers, and metadata
+    """
+    try:
+        # Get gainers and losers
+        gainers = get_day_gainers(count=10)
+        losers = get_day_losers(count=5)
+        
+        # Format data for frontend
+        formatted_gainers = []
+        for stock in gainers:
+            formatted_gainers.append({
+                "symbol": stock["symbol"],
+                "company_name": stock["company_name"],
+                "price": round(stock["price"], 2),
+                "change": round(stock["change"], 2),
+                "change_percent": round(stock["change_percent"], 2),
+                "volume": stock["volume"],
+                "market_cap": stock["market_cap"],
+                "market_cap_formatted": format_market_cap(stock["market_cap"]),
+                "sector": stock["sector"],
+                "exchange": stock["exchange"],
+                "fifty_two_week_high": stock["fifty_two_week_high"],
+                "fifty_two_week_low": stock["fifty_two_week_low"],
+                "pe_ratio": round(stock["pe_ratio"], 2) if stock["pe_ratio"] else None,
+                "book_value": round(stock["book_value"], 2) if stock["book_value"] else None
+            })
+        
+        formatted_losers = []
+        for stock in losers:
+            formatted_losers.append({
+                "symbol": stock["symbol"],
+                "company_name": stock["company_name"],
+                "price": round(stock["price"], 2),
+                "change": round(stock["change"], 2),
+                "change_percent": round(stock["change_percent"], 2),
+                "volume": stock["volume"],
+                "market_cap": stock["market_cap"],
+                "market_cap_formatted": format_market_cap(stock["market_cap"]),
+                "sector": stock["sector"],
+                "exchange": stock["exchange"],
+                "fifty_two_week_high": stock["fifty_two_week_high"],
+                "fifty_two_week_low": stock["fifty_two_week_low"],
+                "pe_ratio": round(stock["pe_ratio"], 2) if stock["pe_ratio"] else None,
+                "book_value": round(stock["book_value"], 2) if stock["book_value"] else None
+            })
+        
+        return {
+            "gainers": formatted_gainers,
+            "losers": formatted_losers,
+            "timestamp": "now",
+            "total_gainers": len(formatted_gainers),
+            "total_losers": len(formatted_losers)
+        }
+        
+    except Exception as e:
+        logger.error(f"Error getting trending data from Polygon: {e}")
+        return {
+            "gainers": [],
+            "losers": [],
+            "timestamp": "now",
+            "total_gainers": 0,
+            "total_losers": 0,
+            "error": str(e)
+        } 

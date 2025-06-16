@@ -6,6 +6,7 @@ from app.backend.models.schemas import ErrorResponse, HedgeFundRequest
 from app.backend.models.events import StartEvent, ProgressUpdateEvent, ErrorEvent, CompleteEvent
 from app.backend.services.graph import create_graph, parse_hedge_fund_response, run_graph_async
 from app.backend.services.portfolio import create_portfolio
+from app.backend.services.recent_analysis import save_analysis_result
 from src.utils.progress import progress
 
 router = APIRouter(prefix="/hedge-fund")
@@ -83,11 +84,30 @@ async def run_hedge_fund(request: HedgeFundRequest):
                     yield ErrorEvent(message="Failed to generate hedge fund decisions").to_sse()
                     return
 
+                # Parse final results
+                decisions = parse_hedge_fund_response(result.get("messages", [])[-1].content)
+                analyst_signals = result.get("data", {}).get("analyst_signals", {})
+                
+                # Save analysis results to cache for recent analysis tracking
+                try:
+                    save_analysis_result(
+                        tickers=request.tickers,
+                        analyst_signals=analyst_signals,
+                        decisions=decisions,
+                        selected_agents=request.selected_agents,
+                        start_date=request.get_start_date(),
+                        end_date=request.end_date
+                    )
+                except Exception as e:
+                    # Log error but don't fail the analysis
+                    import logging
+                    logging.getLogger(__name__).error(f"Failed to save analysis result: {e}")
+                
                 # Send the final result
                 final_data = CompleteEvent(
                     data={
-                        "decisions": parse_hedge_fund_response(result.get("messages", [])[-1].content),
-                        "analyst_signals": result.get("data", {}).get("analyst_signals", {}),
+                        "decisions": decisions,
+                        "analyst_signals": analyst_signals,
                     }
                 )
                 yield final_data.to_sse()

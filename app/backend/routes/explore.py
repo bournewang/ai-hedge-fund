@@ -4,7 +4,7 @@ from fastapi import APIRouter, HTTPException
 from typing import Dict, Any
 import logging
 
-from src.tools.yahoo_finance import get_trending_data, get_day_gainers
+from src.tools.polygon_data import get_trending_data, get_day_gainers
 
 router = APIRouter(prefix="/explore", tags=["explore"])
 logger = logging.getLogger(__name__)
@@ -18,7 +18,7 @@ def get_trending_stocks() -> Dict[str, Any]:
     Returns both day gainers and losers with comprehensive market data.
     """
     try:
-        logger.info("Fetching trending stocks data for explore page")
+        logger.info("Fetching trending stocks data for explore page using Polygon.io")
         
         trending_data = get_trending_data()
         
@@ -43,7 +43,7 @@ def get_trending_stocks() -> Dict[str, Any]:
 @router.get("/gainers")
 def get_gainers_only(count: int = 10) -> Dict[str, Any]:
     """
-    Get only day gainers for focused trending data.
+    Get only day gainers for focused trending data using Polygon.io.
     
     Args:
         count: Number of gainers to return (default: 10, max: 25)
@@ -52,28 +52,37 @@ def get_gainers_only(count: int = 10) -> Dict[str, Any]:
         if count < 1 or count > 25:
             raise HTTPException(status_code=400, detail="Count must be between 1 and 25")
         
-        logger.info(f"Fetching {count} day gainers")
+        logger.info(f"Fetching {count} day gainers using Polygon.io")
         
         gainers = get_day_gainers(count=count)
         
-        # Format for frontend
+        # Format for frontend (Polygon returns dict format, not object)
         formatted_gainers = []
-        for stock in gainers:
+        for stock_data in gainers:
+            # Format market cap
+            market_cap = stock_data.get('market_cap', 0)
+            if market_cap >= 1_000_000_000:
+                market_cap_formatted = f"${market_cap / 1_000_000_000:.1f}B"
+            elif market_cap >= 1_000_000:
+                market_cap_formatted = f"${market_cap / 1_000_000:.1f}M"
+            else:
+                market_cap_formatted = f"${market_cap:,.0f}" if market_cap > 0 else "N/A"
+            
             formatted_gainers.append({
-                "symbol": stock.symbol,
-                "company_name": stock.company_name,
-                "price": round(stock.price, 2),
-                "change": round(stock.change, 2),
-                "change_percent": round(stock.change_percent, 2),
-                "volume": stock.volume,
-                "market_cap": stock.market_cap,
-                "market_cap_formatted": f"${stock.market_cap / 1_000_000_000:.1f}B" if stock.market_cap >= 1_000_000_000 else f"${stock.market_cap / 1_000_000:.1f}M",
-                "sector": stock.sector,
-                "exchange": stock.exchange,
-                "fifty_two_week_high": stock.fifty_two_week_high,
-                "fifty_two_week_low": stock.fifty_two_week_low,
-                "pe_ratio": round(stock.pe_ratio, 2) if stock.pe_ratio else None,
-                "book_value": round(stock.book_value, 2) if stock.book_value else None
+                "symbol": stock_data.get('symbol', ''),
+                "company_name": stock_data.get('company_name', ''),
+                "price": round(stock_data.get('price', 0), 2),
+                "change": round(stock_data.get('change', 0), 2),
+                "change_percent": round(stock_data.get('change_percent', 0), 2),
+                "volume": stock_data.get('volume', 0),
+                "market_cap": market_cap,
+                "market_cap_formatted": market_cap_formatted,
+                "sector": stock_data.get('sector'),
+                "exchange": stock_data.get('exchange', 'US'),
+                "fifty_two_week_high": stock_data.get('fifty_two_week_high'),
+                "fifty_two_week_low": stock_data.get('fifty_two_week_low'),
+                "pe_ratio": stock_data.get('pe_ratio'),
+                "book_value": stock_data.get('book_value')
             })
         
         return {
@@ -123,14 +132,14 @@ def analyze_trending_stock(symbol: str) -> Dict[str, Any]:
 def explore_health_check() -> Dict[str, str]:
     """Health check endpoint for explore functionality."""
     try:
-        # Test Yahoo Finance connection with minimal request
+        # Test Polygon.io connection with minimal request
         test_gainers = get_day_gainers(count=1)
         
         if test_gainers:
-            return {"status": "healthy", "yahoo_finance": "connected"}
+            return {"status": "healthy", "polygon_io": "connected", "data_source": "polygon"}
         else:
-            return {"status": "degraded", "yahoo_finance": "no_data"}
+            return {"status": "degraded", "polygon_io": "no_data", "data_source": "polygon"}
             
     except Exception as e:
         logger.error(f"Explore health check failed: {e}")
-        return {"status": "unhealthy", "error": str(e)} 
+        return {"status": "unhealthy", "error": str(e), "data_source": "polygon"} 

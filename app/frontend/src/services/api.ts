@@ -37,6 +37,25 @@ export interface TrendingStock {
   book_value?: number;
 }
 
+export interface RecentAnalysis {
+  id: string;
+  ticker: string;
+  signal: string;
+  confidence: number;
+  timestamp: string;
+  initial_price: number | null;
+  agents_used: string[];
+  agent_count: number;
+  bullish_agents: number;
+  bearish_agents: number;
+  analysis_period: string;
+  reasoning: string;
+  change: string;
+  change_percent_numeric: number | null;
+  time: string;
+  current_price: number | null;
+}
+
 export interface ExploreData {
   gainers: TrendingStock[];
   losers: TrendingStock[];
@@ -239,6 +258,26 @@ export const api = {
       return result.data.gainers;
     } catch (error) {
       console.error('Error fetching day gainers:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Fetch recent analyses with performance tracking
+   */
+  getRecentAnalyses: async (limit: number = 20): Promise<RecentAnalysis[]> => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/recent-analyses?limit=${limit}`);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const result = await response.json();
+      if (!result.success) {
+        throw new Error('Failed to fetch recent analyses');
+      }
+      return result.data;
+    } catch (error) {
+      console.error('Error fetching recent analyses:', error);
       throw error;
     }
   },

@@ -103,8 +103,40 @@ class Cache:
 
     def set_trending_stocks(self, cache_key: str, data: List[Dict[str, Any]]):
         """Cache trending stocks data."""
-        # Set with TTL of 5 minutes (300 seconds) since market data changes frequently
-        self._cache.set(f"trending:{cache_key}", data, expire=300)
+        # Set with TTL of 24 hours (86400 seconds) - date in key ensures daily invalidation
+        self._cache.set(f"trending:{cache_key}", data, expire=86400)
+
+    # Recent analyses cache methods
+    def get_recent_analyses(self, limit: int = 20) -> List[Dict[str, Any]]:
+        """Get recent analyses from cache, sorted by timestamp (newest first)."""
+        cached_data = self._cache.get("recent_analyses")
+        if not cached_data:
+            return []
+        
+        # Sort by timestamp (newest first) and limit results
+        sorted_analyses = sorted(cached_data, key=lambda x: x.get('timestamp', ''), reverse=True)
+        return sorted_analyses[:limit]
+
+    def add_recent_analysis(self, analysis_data: Dict[str, Any]):
+        """Add a new analysis to the recent analyses cache."""
+        cached_data = self._cache.get("recent_analyses") or []
+        
+        # Add the new analysis
+        cached_data.append(analysis_data)
+        
+        # Keep only the last 100 analyses to prevent cache bloat
+        if len(cached_data) > 100:
+            # Sort by timestamp and keep the 100 most recent
+            sorted_analyses = sorted(cached_data, key=lambda x: x.get('timestamp', ''), reverse=True)
+            cached_data = sorted_analyses[:100]
+        
+        # Store with TTL of 1 year (31536000 seconds) for long-term analysis history
+        self._cache.set("recent_analyses", cached_data, expire=31536000)
+
+    def clear_recent_analyses(self):
+        """Clear all recent analyses from cache."""
+        if "recent_analyses" in self._cache:
+            del self._cache["recent_analyses"]
 
     # Cache management methods
     def get_cache_stats(self) -> Dict[str, int]:
@@ -119,6 +151,7 @@ class Cache:
             "market_cap_cached": 0,
             "llm_responses_cached": 0,
             "trending_stocks_cached": 0,
+            "recent_analyses_cached": 0,
             "total_cache_entries": len(self._cache)
         }
         
@@ -140,6 +173,8 @@ class Cache:
                 stats["llm_responses_cached"] += 1
             elif key.startswith("trending:"):
                 stats["trending_stocks_cached"] += 1
+            elif key == "recent_analyses":
+                stats["recent_analyses_cached"] += 1
         
         return stats
 

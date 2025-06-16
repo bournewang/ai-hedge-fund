@@ -4,11 +4,12 @@ import { DashboardPage } from './components/DashboardPage';
 import { AnalysisForm } from './components/AnalysisForm';
 import { AgentsDescription } from './components/AgentsDescription';
 import { ExplorePage } from './components/ExplorePage';
+import { RecentAnalysesPage } from './components/RecentAnalysesPage';
 // import { MonitoringPage } from './components/MonitoringPage';
 // import { ValuePicksPage } from './components/ValuePicksPage';
 import { Layout } from './components/Layout';
 import { Button } from './components/ui/button';
-import { Users, TrendingUp, Home, BarChart3 } from 'lucide-react';
+import { Users, TrendingUp, Home, BarChart3, Clock } from 'lucide-react';
 import { ThemeToggle } from './components/ui/theme-toggle';
 
 function Navigation() {
@@ -18,6 +19,7 @@ function Navigation() {
     { path: '/', label: 'Home', icon: Home },
     { path: '/analysis', label: 'Analysis', icon: BarChart3 },
     { path: '/explore', label: 'Explore', icon: TrendingUp },
+    { path: '/recent-analyses', label: 'Recent Analyses', icon: Clock },
     // { path: '/monitoring', label: 'Monitoring', icon: Eye },
     // { path: '/value-picks', label: 'Value Picks', icon: Gem },
     { path: '/agents', label: 'AI Masters', icon: Users },
@@ -74,6 +76,7 @@ export default function App() {
           <Route path="/" element={<DashboardPage />} />
           <Route path="/analysis" element={<AnalysisForm onAnalysisStart={handleAnalysisStart} />} />
           <Route path="/explore" element={<ExplorePage />} />
+          <Route path="/recent-analyses" element={<RecentAnalysesPage />} />
           {/* <Route path="/monitoring" element={<MonitoringPage />} /> */}
           {/* <Route path="/value-picks" element={<ValuePicksPage />} /> */}
           <Route path="/agents" element={<AgentsDescription />} />
