@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { CheckCircle2, PlayCircle, TrendingUp, Users, BarChart3, RotateCcw, AlertCircle, X, Search } from 'lucide-react';
-import { agents, investmentStyles, getAgentsByCategory, type AgentItem } from '@/data/agents';
+import { getAgents, getAgentByKey, investmentStyles, getAgentsByCategory, type AgentItem } from '@/data/agents';
 import { useNodeContext } from '@/contexts/node-context';
 import { api } from '@/services/api';
 import { tickerSymbolsService } from '@/services/tickerSymbols';
@@ -193,7 +193,7 @@ export function AnalysisForm({ onAnalysisStart }: AnalysisFormProps) {
   // 根据投资风格获取推荐的代理
   const getRecommendedAgents = useCallback((style: InvestmentStyle | 'all'): AgentItem[] => {
     if (style === 'all') {
-      return agents.filter(agent => 
+      return getAgents().filter((agent: AgentItem) => 
         ['warren_buffett', 'cathie_wood', 'technical_analyst', 'risk_manager'].includes(agent.key)
       );
     }
@@ -240,10 +240,10 @@ export function AnalysisForm({ onAnalysisStart }: AnalysisFormProps) {
   // 重置所有状态
   const handleReset = useCallback(() => {
     // 重置表单状态
-    setTickers('AAPL,MSFT,NVDA');
-    setSelectedAgents([]);
-    setSelectedStyle('all');
-    setTickerInput('');
+    // setTickers('AAPL,MSFT,NVDA');
+    // setSelectedAgents([]);
+    // setSelectedStyle('all');
+    // setTickerInput('');
     setShowSuggestions(false);
     setSuggestions([]);
     setSelectedSuggestionIndex(-1);
@@ -304,7 +304,7 @@ export function AnalysisForm({ onAnalysisStart }: AnalysisFormProps) {
               onClick={handleReset}
             >
               <RotateCcw className="h-4 w-4" />
-{t('common.reset')}
+              {t('common.reset')}
             </Button>
           )}
         </div>
@@ -562,7 +562,7 @@ export function AnalysisForm({ onAnalysisStart }: AnalysisFormProps) {
                       <div className="bg-white/80 dark:bg-white/10 rounded-lg p-3 border border-purple-200 dark:border-purple-700">
                         <div className="font-medium text-purple-800 dark:text-purple-300 mb-1">{t('analysisForm.step4.mastersLabel')}</div>
                         <div className="text-purple-600 dark:text-purple-400 font-semibold">
-                            {selectedAgents.map(agent => agents.find(a => a.key === agent)?.display_name).join(', ')} </div>
+                            {selectedAgents.map(agent => getAgentByKey(agent)?.display_name).join(', ')} </div>
                       </div>
                     </div>
 

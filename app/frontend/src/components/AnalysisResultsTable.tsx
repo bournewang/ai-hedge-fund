@@ -14,7 +14,7 @@ import {
   BarChart3,
   TableIcon
 } from 'lucide-react';
-import { agents, type AgentItem } from '@/data/agents';
+import { getAgentByKey, type AgentItem } from '@/data/agents';
 import { useLanguage } from '@/hooks/useLanguage';
 
 interface AnalysisResultsTableProps {
@@ -51,7 +51,7 @@ export function AnalysisResultsTable({
 
   // Get agent info
   const getAgentInfo = (agentKey: string): AgentItem | null => {
-    return agents.find(agent => agent.key === agentKey) || null;
+    return getAgentByKey(agentKey) || null;
   };
 
   // Get action icon
@@ -209,7 +209,7 @@ export function AnalysisResultsTable({
                                 className="flex items-center gap-1 w-fit"
                               >
                                 {getActionIcon(decision.action)}
-                                {decision.action.toUpperCase()}
+                                {t(`signals.${decision.action}`)}
                               </Badge>
                               {decision.confidence && (
                                 <span className="text-xs text-muted-foreground">
@@ -234,7 +234,7 @@ export function AnalysisResultsTable({
                                     className="flex items-center gap-1"
                                   >
                                     {getActionIcon(agentResults.signal)}
-                                    {agentResults.signal.toUpperCase()}
+                                    {t(`signals.${agentResults.signal}`)}
                                   </Badge>
                                   {agentResults.confidence && (
                                     <span className="text-xs text-muted-foreground">
@@ -281,7 +281,7 @@ export function AnalysisResultsTable({
                       <CardTitle className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
                           <Eye className="h-5 w-5 text-blue-600 dark:text-blue-500" />
-{ticker} {t('analysisResultsTable.analysisResults')}
+                          {ticker} {t('analysisResultsTable.analysisResults')}
                         </div>
                         {decision && (
                           <Badge 
@@ -289,7 +289,7 @@ export function AnalysisResultsTable({
                             className="flex items-center gap-1"
                           >
                             {getActionIcon(decision.action)}
-                            {decision.action.toUpperCase()}
+                            {t(`signals.${decision.action}`)}
                             {decision.confidence && ` (${decision.confidence}%)`}
                           </Badge>
                         )}
@@ -347,7 +347,7 @@ export function AnalysisResultsTable({
                                   className="flex items-center gap-1"
                                 >
                                   {getActionIcon(agentResults.signal)}
-                                  {agentResults.signal.toUpperCase()}
+                                  {t(`signals.${agentResults.signal}`)}
                                 </Badge>
                               </div>
                               {agentResults.confidence && (
@@ -403,7 +403,7 @@ export function AnalysisResultsTable({
                       return (
                         <TableRow key={ticker}>
                           <TableCell className="font-mono">{ticker}</TableCell>
-                          <TableCell>{decision?.action || 'N/A'}</TableCell>
+                          <TableCell>{t(`signals.${decision?.action}`)}</TableCell>
                           <TableCell>{decision?.confidence ? `${decision.confidence}%` : 'N/A'}</TableCell>
                           <TableCell className="max-w-xs truncate">{decision?.reasoning || 'N/A'}</TableCell>
                           {selectedAgents.map(agentKey => {
@@ -411,7 +411,7 @@ export function AnalysisResultsTable({
                             const agentResults = agentSignals[fullAgentKey]?.[ticker];
                             return (
                               <TableCell key={agentKey}>
-                                {agentResults?.signal || 'N/A'}
+                                {t(`signals.${agentResults?.signal}`)}
                               </TableCell>
                             );
                           })}

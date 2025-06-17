@@ -9,7 +9,7 @@ import {
   Loader2,
   BarChart3
 } from 'lucide-react';
-import { agents, type AgentItem } from '@/data/agents';
+import { getAgentByKey, type AgentItem } from '@/data/agents';
 import { useLanguage } from '@/hooks/useLanguage';
 
 interface AgentNodeData {
@@ -36,7 +36,7 @@ export function AnalysisProgressMatrix({
 
   // Get agent info
   const getAgentInfo = (agentKey: string): AgentItem | null => {
-    return agents.find(agent => agent.key === agentKey) || null;
+    return getAgentByKey(agentKey) || null;
   };
 
   // Get status for specific agent-ticker combination

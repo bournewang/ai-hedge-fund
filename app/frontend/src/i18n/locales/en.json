@@ -299,7 +299,18 @@
       "BUY": "BUY",
       "HOLD": "HOLD",
       "SELL": "SELL",
-      "STRONG SELL": "STRONG SELL"
+      "STRONG SELL": "STRONG SELL",
+      "BULLISH": "BULLISH",
+      "BEARISH": "BEARISH",
+      "NEUTRAL": "NEUTRAL",
+      "SHORT": "SHORT",
+      "LONG": "LONG",
+      "hold": "HOLD",
+      "bullish": "BULLISH",
+      "bearish": "BEARISH",
+      "neutral": "NEUTRAL",
+      "short": "SHORT",
+      "long": "LONG"
     },
     "investmentStyles": {
       "value": {

@@ -299,7 +299,18 @@
       "BUY": "买入",
       "HOLD": "持有",
       "SELL": "卖出",
-      "STRONG SELL": "强烈卖出"
+      "STRONG SELL": "强烈卖出",
+      "BULLISH": "看涨",
+      "BEARISH": "看跌",
+      "NEUTRAL": "中性",
+      "SHORT": "做空",
+      "LONG": "做多",
+      "hold": "持有",
+      "bullish": "看涨",
+      "bearish": "看跌",
+      "neutral": "中性",
+      "short": "做空",
+      "long": "做多"
     },
     "investmentStyles": {
       "value": {
