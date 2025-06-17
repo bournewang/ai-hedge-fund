@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { BrowserRouter, Routes, Route, Link, useLocation } from 'react-router-dom';
 import { DashboardPage } from './components/DashboardPage';
 import { AnalysisForm } from './components/AnalysisForm';
@@ -62,19 +61,13 @@ function Navigation() {
 }
 
 export default function App() {
-  const [showLeftSidebar] = useState(false);
-  const [showRightSidebar] = useState(false);
-
   const handleAnalysisStart = () => {
     console.log('Analysis started');
   };
 
   return (
     <BrowserRouter>
-      <Layout
-        leftSidebar={showLeftSidebar ? <div className="p-4 text-white">Left Sidebar Content</div> : undefined}
-        rightSidebar={showRightSidebar ? <div className="p-4 text-white">Right Sidebar Content</div> : undefined}
-      >
+      <Layout>
         <Navigation />
 
         {/* Routes */}

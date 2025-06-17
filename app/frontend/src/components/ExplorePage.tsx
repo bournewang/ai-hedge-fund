@@ -18,13 +18,6 @@ import {
 import { api, TrendingStock } from '@/services/api';
 import { useLanguage } from '@/hooks/useLanguage';
 
-// Map sector names that might come from the API
-const normalizeSecctor = (sector: string | null): string => {
-  if (!sector) return 'Other';
-  // Add more sector mappings as needed
-  return sector;
-};
-
 export function ExplorePage() {
   const navigate = useNavigate();
   const { t } = useLanguage();
@@ -268,7 +261,7 @@ export function ExplorePage() {
                       </div> */}
 
                       {/* Key Metrics */}
-                      <div className="text-xs text-muted-foreground space-y-1">
+                      {/* <div className="text-xs text-muted-foreground space-y-1">
                         <div className="flex justify-between">
                           <span>{t('explore.metrics.marketCap')}</span>
                           <span className="font-medium">{stock.market_cap_formatted}</span>
@@ -279,7 +272,7 @@ export function ExplorePage() {
                             <span className="font-medium">{stock.pe_ratio.toFixed(2)}</span>
                           </div>
                         )}
-                      </div>
+                      </div> */}
 
                       {/* Selection Indicator */}
                       <div className="text-xs text-center pt-2 border-t">

@@ -15,8 +15,10 @@ import {
   Filter,
   Search
 } from 'lucide-react';
+import { useLanguage } from '@/hooks/useLanguage';
 
 export function RecentAnalysesPage() {
+  const { t } = useLanguage();
   const [analyses, setAnalyses] = useState<RecentAnalysis[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -88,9 +90,9 @@ export function RecentAnalysesPage() {
         <div className="max-w-6xl mx-auto px-4 py-8">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold mb-2">Recent Analyses</h1>
+              <h1 className="text-3xl font-bold mb-2">{t('recentAnalyses.title')}</h1>
               <p className="text-blue-100">
-                Track all AI-generated investment analyses and their performance
+                {t('recentAnalyses.subtitle')}
               </p>
             </div>
             <Button 
@@ -103,7 +105,7 @@ export function RecentAnalysesPage() {
               ) : (
                 <RefreshCw className="w-4 h-4 mr-2" />
               )}
-              Refresh
+              {t('recentAnalyses.refresh')}
             </Button>
           </div>
         </div>
@@ -116,7 +118,7 @@ export function RecentAnalysesPage() {
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
             <input
               type="text"
-              placeholder="Search by ticker or reasoning..."
+              placeholder={t('recentAnalyses.searchPlaceholder')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-10 pr-4 py-2 border border-input bg-background rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
@@ -129,7 +131,7 @@ export function RecentAnalysesPage() {
               onChange={(e) => setFilterSignal(e.target.value)}
               className="px-3 py-2 border border-input bg-background rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
             >
-              <option value="all">All Signals</option>
+              <option value="all">{t('recentAnalyses.allSignals')}</option>
               {uniqueSignals.map(signal => (
                 <option key={signal} value={signal}>{signal}</option>
               ))}
@@ -143,7 +145,7 @@ export function RecentAnalysesPage() {
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">Total Analyses</p>
+                  <p className="text-sm text-muted-foreground">{t('recentAnalyses.stats.totalAnalyses')}</p>
                   <p className="text-2xl font-bold">{analyses.length}</p>
                 </div>
                 <BarChart3 className="h-8 w-8 text-blue-500" />
@@ -155,7 +157,7 @@ export function RecentAnalysesPage() {
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">Positive Changes</p>
+                  <p className="text-sm text-muted-foreground">{t('recentAnalyses.stats.positiveChanges')}</p>
                   <p className="text-2xl font-bold text-green-600">
                     {analyses.filter(a => a.change.startsWith('+')).length}
                   </p>
@@ -169,7 +171,7 @@ export function RecentAnalysesPage() {
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">Negative Changes</p>
+                  <p className="text-sm text-muted-foreground">{t('recentAnalyses.stats.negativeChanges')}</p>
                   <p className="text-2xl font-bold text-red-600">
                     {analyses.filter(a => a.change.startsWith('-')).length}
                   </p>
@@ -183,7 +185,7 @@ export function RecentAnalysesPage() {
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">Avg Confidence</p>
+                  <p className="text-sm text-muted-foreground">{t('recentAnalyses.stats.avgConfidence')}</p>
                   <p className="text-2xl font-bold">
                     {analyses.length > 0 ? Math.round(analyses.reduce((sum, a) => sum + a.confidence, 0) / analyses.length) : 0}%
                   </p>
@@ -198,7 +200,7 @@ export function RecentAnalysesPage() {
         {isLoading && (
           <div className="flex items-center justify-center p-8">
             <Loader2 className="h-8 w-8 animate-spin mr-3" />
-            <span className="text-lg text-muted-foreground">Loading recent analyses...</span>
+            <span className="text-lg text-muted-foreground">{t('recentAnalyses.loading')}</span>
           </div>
         )}
 
@@ -208,7 +210,7 @@ export function RecentAnalysesPage() {
             <CardContent className="p-6 text-center">
               <p className="text-red-600 dark:text-red-400 mb-4">{error}</p>
               <Button onClick={fetchAnalyses} variant="outline">
-                Try Again
+                {t('recentAnalyses.tryAgain')}
               </Button>
             </CardContent>
           </Card>
@@ -219,9 +221,12 @@ export function RecentAnalysesPage() {
           <>
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-semibold">
-                {filteredAnalyses.length} Analysis{filteredAnalyses.length !== 1 ? 'es' : ''}
-                {searchTerm && ` matching "${searchTerm}"`}
-                {filterSignal !== 'all' && ` with ${filterSignal} signal`}
+                {t('recentAnalyses.results.analysisCount', { 
+                  count: filteredAnalyses.length, 
+                  plural: filteredAnalyses.length !== 1 ? 'es' : '' 
+                })}
+                {searchTerm && ` ${t('recentAnalyses.results.matching', { term: searchTerm })}`}
+                {filterSignal !== 'all' && ` ${t('recentAnalyses.results.withSignal', { signal: filterSignal })}`}
               </h2>
             </div>
 
@@ -238,7 +243,7 @@ export function RecentAnalysesPage() {
                             {analysis.signal}
                           </Badge>
                           <span className="text-sm text-muted-foreground">
-                            Confidence: {analysis.confidence}%
+                            {t('recentAnalyses.results.confidence')} {analysis.confidence}%
                           </span>
                         </div>
                         
@@ -249,7 +254,10 @@ export function RecentAnalysesPage() {
                         <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
                           <div className="flex items-center gap-1">
                             <Users className="w-4 h-4" />
-                            <span>{analysis.agent_count} agent{analysis.agent_count !== 1 ? 's' : ''}</span>
+                            <span>{t('recentAnalyses.results.agents', { 
+                              count: analysis.agent_count, 
+                              plural: analysis.agent_count !== 1 ? 's' : '' 
+                            })}</span>
                           </div>
                           <div className="flex items-center gap-1">
                             <Calendar className="w-4 h-4" />
@@ -269,22 +277,22 @@ export function RecentAnalysesPage() {
                         </div>
                         {analysis.current_price && (
                           <div className="text-sm text-muted-foreground">
-                            Current: ${analysis.current_price.toFixed(2)}
+                            {t('recentAnalyses.results.current')} ${analysis.current_price.toFixed(2)}
                           </div>
                         )}
                         {analysis.initial_price && (
                           <div className="text-sm text-muted-foreground">
-                            Initial: ${analysis.initial_price.toFixed(2)}
+                            {t('recentAnalyses.results.initial')} ${analysis.initial_price.toFixed(2)}
                           </div>
                         )}
                         
                         {/* Agent Breakdown */}
                         <div className="flex items-center gap-2 mt-2 lg:justify-end">
                           <div className="text-xs bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-2 py-1 rounded">
-                            {analysis.bullish_agents} bullish
+                            {analysis.bullish_agents} {t('recentAnalyses.results.bullish')}
                           </div>
                           <div className="text-xs bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 px-2 py-1 rounded">
-                            {analysis.bearish_agents} bearish
+                            {analysis.bearish_agents} {t('recentAnalyses.results.bearish')}
                           </div>
                         </div>
                       </div>
@@ -299,9 +307,9 @@ export function RecentAnalysesPage() {
               <Card>
                 <CardContent className="p-8 text-center">
                   <BarChart3 className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                  <h3 className="text-lg font-semibold mb-2">No analyses found</h3>
+                  <h3 className="text-lg font-semibold mb-2">{t('recentAnalyses.emptyStates.noResultsTitle')}</h3>
                   <p className="text-muted-foreground">
-                    Try adjusting your search terms or filters.
+                    {t('recentAnalyses.emptyStates.noResultsDescription')}
                   </p>
                 </CardContent>
               </Card>
@@ -312,12 +320,12 @@ export function RecentAnalysesPage() {
               <Card>
                 <CardContent className="p-8 text-center">
                   <BarChart3 className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                  <h3 className="text-lg font-semibold mb-2">No analyses yet</h3>
+                  <h3 className="text-lg font-semibold mb-2">{t('recentAnalyses.emptyStates.noDataTitle')}</h3>
                   <p className="text-muted-foreground mb-4">
-                    Run your first analysis to see results here.
+                    {t('recentAnalyses.emptyStates.noDataDescription')}
                   </p>
                   <Button asChild>
-                    <a href="/analysis">Start Analysis</a>
+                    <a href="/analysis">{t('recentAnalyses.emptyStates.startAnalysis')}</a>
                   </Button>
                 </CardContent>
               </Card>

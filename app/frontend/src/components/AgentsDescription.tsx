@@ -3,8 +3,8 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Search, BookOpen, TrendingUp, Users, BarChart3, Info } from 'lucide-react';
-import { agents, investmentStyles } from '@/data/agents';
+import { Search, BookOpen, TrendingUp, Users, BarChart3, Info, Award, Calendar, Star } from 'lucide-react';
+import { getAgents, getInvestmentStyles } from '@/data/agents';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -13,11 +13,17 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { useLanguage } from '@/hooks/useLanguage';
 
 export function AgentsDescription() {
+  const { t } = useLanguage();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedStyle, setSelectedStyle] = useState<string>('all');
   const [selectedAgent, setSelectedAgent] = useState<string | null>(null);
+
+  // Get current language data
+  const agents = getAgents();
+  const investmentStyles = getInvestmentStyles();
 
   // Filter agents based on search query and selected style
   const filteredAgents = useMemo(() => {
@@ -32,12 +38,12 @@ export function AgentsDescription() {
 
       return matchesSearch && matchesStyle;
     });
-  }, [searchQuery, selectedStyle]);
+  }, [searchQuery, selectedStyle, agents]);
 
   // Get the currently selected agent's details
   const currentAgent = useMemo(() => {
     return agents.find(agent => agent.key === selectedAgent);
-  }, [selectedAgent]);
+  }, [selectedAgent, agents]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -46,23 +52,23 @@ export function AgentsDescription() {
         <div className="max-w-6xl mx-auto px-4">
           <div className="text-center space-y-4">
             <h1 className="text-4xl md:text-5xl font-bold">
-              AI Investment Masters
+              {t('agents.title')}
             </h1>
             <p className="text-xl md:text-2xl text-blue-100">
-              17 World-Class Investment Experts at Your Service
+              {t('agents.subtitle')}
             </p>
             <div className="flex items-center justify-center gap-4 mt-8">
               <Badge variant="secondary" className="px-4 py-2 text-lg">
                 <Users className="w-5 h-5 mr-2" />
-                17 Experts
+                {t('agents.badges.experts')}
               </Badge>
               <Badge variant="secondary" className="px-4 py-2 text-lg">
                 <TrendingUp className="w-5 h-5 mr-2" />
-                6 Investment Styles
+                {t('agents.badges.styles')}
               </Badge>
               <Badge variant="secondary" className="px-4 py-2 text-lg">
                 <BarChart3 className="w-5 h-5 mr-2" />
-                Multiple Strategies
+                {t('agents.badges.strategies')}
               </Badge>
             </div>
           </div>
@@ -77,7 +83,7 @@ export function AgentsDescription() {
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
             <Input
               className="pl-10 py-6 text-lg"
-              placeholder="Search by name, style, or description..."
+              placeholder={t('agents.searchPlaceholder')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -88,7 +94,7 @@ export function AgentsDescription() {
         <Tabs defaultValue="all" className="mb-8" onValueChange={setSelectedStyle}>
           <TabsList className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2">
             <TabsTrigger value="all" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-              All Styles
+              {t('agents.allStyles')}
             </TabsTrigger>
             {Object.entries(investmentStyles).map(([key, style]) => (
               <TabsTrigger
@@ -97,7 +103,7 @@ export function AgentsDescription() {
                 className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
               >
                 <span className="mr-2">{style.icon}</span>
-                {style.name}
+                {t(`agents.investmentStyles.${key}.name`)}
               </TabsTrigger>
             ))}
           </TabsList>
@@ -123,7 +129,7 @@ export function AgentsDescription() {
                         investmentStyles[agent.category as keyof typeof investmentStyles]?.color
                       }`}
                     >
-                      {investmentStyles[agent.category as keyof typeof investmentStyles]?.name}
+                      {t(`agents.investmentStyles.${agent.category}.name`)}
                     </Badge>
                   </div>
                 </CardHeader>
@@ -132,13 +138,36 @@ export function AgentsDescription() {
                     <p className="text-muted-foreground text-sm leading-relaxed">
                       {agent.description}
                     </p>
+                    
+                    {/* Agent highlights */}
+                    {/* <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                      {agent.historical_performance && (
+                        <div className="flex items-center gap-1">
+                          <Award className="w-3 h-3" />
+                          <span>{t('agents.agentData.trackRecord')}</span>
+                        </div>
+                      )}
+                      {agent.example_analyses && agent.example_analyses.length > 0 && (
+                        <div className="flex items-center gap-1">
+                          <Star className="w-3 h-3" />
+                          <span>{agent.example_analyses.length} {t('agents.agentData.caseStudies')}</span>
+                        </div>
+                      )}
+                      {agent.specialties && agent.specialties.length > 0 && (
+                        <div className="flex items-center gap-1">
+                          <Users className="w-3 h-3" />
+                          <span>{agent.specialties.length} {t('agents.agentData.specialties')}</span>
+                        </div>
+                      )}
+                    </div> */}
+
                     <Button 
                       variant="ghost" 
-                      className="flex items-center gap-2 text-primary hover:text-primary/90"
+                      className="flex items-center gap-2 text-primary hover:text-primary/90 w-full justify-center"
                       onClick={() => setSelectedAgent(agent.key)}
                     >
                       <BookOpen className="w-4 h-4" />
-                      View Full Profile
+                      {t('agents.viewProfile')}
                     </Button>
                   </div>
                 </CardContent>
@@ -154,15 +183,15 @@ export function AgentsDescription() {
           <div className="flex items-center justify-center gap-8 text-muted-foreground">
             <div className="flex items-center gap-2">
               <Info className="w-5 h-5" />
-              <span>Educational Purpose Only</span>
+              <span>{t('agents.footer.educational')}</span>
             </div>
             <div className="flex items-center gap-2">
               <BookOpen className="w-5 h-5" />
-              <span>Based on Real Investment Principles</span>
+              <span>{t('agents.footer.principles')}</span>
             </div>
             <div className="flex items-center gap-2">
               <TrendingUp className="w-5 h-5" />
-              <span>AI-Powered Analysis</span>
+              <span>{t('agents.footer.aiPowered')}</span>
             </div>
           </div>
         </div>
@@ -187,7 +216,7 @@ export function AgentsDescription() {
                       investmentStyles[currentAgent.category as keyof typeof investmentStyles]?.color
                     }`}
                   >
-                    {investmentStyles[currentAgent.category as keyof typeof investmentStyles]?.name}
+                    {t(`agents.investmentStyles.${currentAgent.category}.name`)}
                   </Badge>
                 </div>
               </DialogHeader>
@@ -196,7 +225,7 @@ export function AgentsDescription() {
                 {/* Biography Section */}
                 {currentAgent.biography && (
                   <div>
-                    <h3 className="text-lg font-semibold text-foreground mb-3">Biography</h3>
+                    <h3 className="text-lg font-semibold text-foreground mb-3">{t('agents.modal.biography')}</h3>
                     <p className="text-muted-foreground leading-relaxed">
                       {currentAgent.biography}
                     </p>
@@ -205,7 +234,7 @@ export function AgentsDescription() {
 
                 {/* Overview Section */}
                 <div>
-                  <h3 className="text-lg font-semibold text-foreground mb-3">Overview</h3>
+                  <h3 className="text-lg font-semibold text-foreground mb-3">{t('agents.modal.overview')}</h3>
                   <p className="text-muted-foreground leading-relaxed">
                     {currentAgent.description}
                   </p>
@@ -213,7 +242,7 @@ export function AgentsDescription() {
 
                 {/* Investment Philosophy */}
                 <div>
-                  <h3 className="text-lg font-semibold text-foreground mb-3">Investment Philosophy</h3>
+                  <h3 className="text-lg font-semibold text-foreground mb-3">{t('agents.modal.philosophy')}</h3>
                   <div className="bg-muted rounded-lg p-4">
                     <ul className="list-disc list-inside space-y-2 text-muted-foreground">
                       {investmentStyles[currentAgent.category as keyof typeof investmentStyles]?.philosophy.map((point, i) => (
@@ -226,13 +255,16 @@ export function AgentsDescription() {
                 {/* Historical Performance */}
                 {currentAgent.historical_performance && (
                   <div>
-                    <h3 className="text-lg font-semibold text-foreground mb-3">Track Record</h3>
+                    <h3 className="text-lg font-semibold text-foreground mb-3">{t('agents.modal.trackRecord')}</h3>
                     <div className="bg-muted rounded-lg p-4">
                       <p className="text-muted-foreground mb-4">{currentAgent.historical_performance.description}</p>
                       <div className="space-y-4">
                         {currentAgent.historical_performance.notable_calls.map((call, i) => (
                           <div key={i} className="border-l-4 border-primary pl-4">
-                            <div className="font-medium text-foreground">{call.year}</div>
+                            <div className="flex items-center gap-2 font-medium text-foreground">
+                              <Calendar className="w-4 h-4" />
+                              {call.year}
+                            </div>
                             <div className="text-muted-foreground">{call.description}</div>
                             <div className="text-sm text-primary mt-1">{call.outcome}</div>
                           </div>
@@ -245,7 +277,7 @@ export function AgentsDescription() {
                 {/* Example Analyses */}
                 {currentAgent.example_analyses && currentAgent.example_analyses.length > 0 && (
                   <div>
-                    <h3 className="text-lg font-semibold text-foreground mb-3">Example Analyses</h3>
+                    <h3 className="text-lg font-semibold text-foreground mb-3">{t('agents.modal.exampleAnalyses')}</h3>
                     <div className="grid gap-4">
                       {currentAgent.example_analyses.map((example, i) => (
                         <div key={i} className="bg-muted rounded-lg p-4">
@@ -263,10 +295,10 @@ export function AgentsDescription() {
 
                 {/* Key Focus Areas */}
                 <div>
-                  <h3 className="text-lg font-semibold text-foreground mb-3">Key Focus Areas</h3>
+                  <h3 className="text-lg font-semibold text-foreground mb-3">{t('agents.modal.focusAreas')}</h3>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="bg-muted rounded-lg p-4">
-                      <h4 className="font-medium text-foreground mb-2">Primary Metrics</h4>
+                      <h4 className="font-medium text-foreground mb-2">{t('agents.modal.primaryMetrics')}</h4>
                       <ul className="list-disc list-inside space-y-1 text-muted-foreground text-sm">
                         {investmentStyles[currentAgent.category as keyof typeof investmentStyles]?.metrics.map((metric, i) => (
                           <li key={i}>{metric}</li>
@@ -274,7 +306,7 @@ export function AgentsDescription() {
                       </ul>
                     </div>
                     <div className="bg-muted rounded-lg p-4">
-                      <h4 className="font-medium text-foreground mb-2">Analysis Methods</h4>
+                      <h4 className="font-medium text-foreground mb-2">{t('agents.modal.analysisMethods')}</h4>
                       <ul className="list-disc list-inside space-y-1 text-muted-foreground text-sm">
                         {investmentStyles[currentAgent.category as keyof typeof investmentStyles]?.methods.map((method, i) => (
                           <li key={i}>{method}</li>
@@ -288,7 +320,7 @@ export function AgentsDescription() {
                 <div className="grid grid-cols-2 gap-4">
                   {/* Specialties/Strengths */}
                   <div>
-                    <h3 className="text-lg font-semibold text-foreground mb-3">Strengths</h3>
+                    <h3 className="text-lg font-semibold text-foreground mb-3">{t('agents.modal.strengths')}</h3>
                     <div className="bg-muted rounded-lg p-4">
                       <ul className="list-disc list-inside space-y-1 text-muted-foreground text-sm">
                         {currentAgent.specialties ? 
@@ -306,7 +338,7 @@ export function AgentsDescription() {
 
                   {/* Limitations */}
                   <div>
-                    <h3 className="text-lg font-semibold text-foreground mb-3">Limitations</h3>
+                    <h3 className="text-lg font-semibold text-foreground mb-3">{t('agents.modal.limitations')}</h3>
                     <div className="bg-muted rounded-lg p-4">
                       <ul className="list-disc list-inside space-y-1 text-muted-foreground text-sm">
                         {currentAgent.limitations ? 

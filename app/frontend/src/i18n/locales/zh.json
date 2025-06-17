@@ -201,6 +201,99 @@
         "description": "请尝试调整行业筛选条件或刷新数据"
       }
     },
+    "recentAnalyses": {
+      "title": "最近分析",
+      "subtitle": "跟踪所有AI生成的投资分析及其表现",
+      "refresh": "刷新",
+      "loading": "正在加载最近的分析...",
+      "tryAgain": "重试",
+      "searchPlaceholder": "按股票代码或理由搜索...",
+      "allSignals": "所有信号",
+      "stats": {
+        "totalAnalyses": "总分析数",
+        "positiveChanges": "正向变化",
+        "negativeChanges": "负向变化",
+        "avgConfidence": "平均置信度"
+      },
+      "results": {
+        "analysisCount": "{{count}} 个分析",
+        "matching": "匹配 \"{{term}}\"",
+        "withSignal": "{{signal}} 信号",
+        "confidence": "置信度：",
+        "agents": "{{count}} 个智能体",
+        "current": "当前：",
+        "initial": "初始：",
+        "bullish": "看涨",
+        "bearish": "看跌"
+      },
+      "emptyStates": {
+        "noResultsTitle": "未找到分析",
+        "noResultsDescription": "请尝试调整搜索条件或筛选器。",
+        "noDataTitle": "暂无分析",
+        "noDataDescription": "运行您的第一个分析以查看结果。",
+        "startAnalysis": "开始分析"
+      }
+    },
+    "agents": {
+      "title": "AI投资大师",
+      "subtitle": "17位世界级投资专家为您服务",
+      "searchPlaceholder": "按姓名、风格或描述搜索...",
+      "allStyles": "所有风格",
+      "viewProfile": "查看完整档案",
+      "badges": {
+        "experts": "17位专家",
+        "styles": "6种投资风格", 
+        "strategies": "多种策略"
+      },
+      "footer": {
+        "educational": "仅供教育目的",
+        "principles": "基于真实投资原则",
+        "aiPowered": "AI驱动分析"
+      },
+      "modal": {
+        "biography": "个人简介",
+        "overview": "概述", 
+        "philosophy": "投资理念",
+        "trackRecord": "历史表现",
+        "exampleAnalyses": "分析案例",
+        "focusAreas": "关键关注领域",
+        "primaryMetrics": "主要指标",
+        "analysisMethods": "分析方法",
+        "strengths": "优势",
+        "limitations": "局限性"
+      },
+      "investmentStyles": {
+        "value": {
+          "name": "价值投资",
+          "description": "寻找被低估的优质公司并长期持有"
+        },
+        "growth": {
+          "name": "成长投资",
+          "description": "投资具有高增长潜力的公司和行业"
+        },
+        "macro": {
+          "name": "宏观投资",
+          "description": "基于宏观经济趋势的投资策略"
+        },
+        "activist": {
+          "name": "激进投资",
+          "description": "积极参与公司治理以释放价值"
+        },
+        "analyst": {
+          "name": "专业分析",
+          "description": "基于专业技术和数据分析"
+        },
+        "risk": {
+          "name": "风险管理",
+          "description": "专注于风险控制和资本保护"
+        }
+      },
+      "agentData": {
+        "trackRecord": "历史表现",
+        "caseStudies": "案例研究",
+        "specialties": "专业领域"
+      }
+    },
     "signals": {
       "STRONG BUY": "强烈买入",
       "BUY": "买入",
@@ -232,35 +325,6 @@
       "risk": {
         "name": "风险管理",
         "description": "专注于风险评估和投资组合优化"
-      }
-    },
-    "agents": {
-      "categories": {
-        "macro": "宏观投资派",
-        "value": "价值投资派",
-        "activist": "激进投资派",
-        "growth": "成长投资派",
-        "analyst": "专业分析派",
-        "risk": "风险管理派"
-      },
-      "styles": {
-        "aswath_damodaran": "估值院长，故事与数字并重",
-        "ben_graham": "价值投资之父，安全边际理论",
-        "bill_ackman": "激进投资者，勇于推动变革",
-        "cathie_wood": "颠覆性创新女王，科技成长专家",
-        "charlie_munger": "理性思维者，优秀企业的公平价格",
-        "michael_burry": "大空头逆向投资者，深度价值挖掘",
-        "peter_lynch": "十倍股猎手，日常业务成长投资",
-        "philip_fisher": "精细成长投资者，深度调研专家",
-        "rakesh_jhunjhunwala": "印度股神，大胆持仓",
-        "stanley_druckenmiller": "宏观投资传奇，不对称机会猎手",
-        "warren_buffett": "奥马哈先知，寻找优秀公司的合理价格",
-        "technical_analyst": "图表模式专家，技术指标分析",
-        "fundamentals_analyst": "财务报表专家，企业价值评估",
-        "sentiment_analyst": "市场情绪专家，投资者心理分析",
-        "valuation_analyst": "公司估值专家，内在价值计算",
-        "risk_manager": "风险管理专家，投资风险评估",
-        "portfolio_manager": "投资组合专家，资产配置优化"
       }
     }
   }

@@ -201,6 +201,99 @@
         "description": "Try adjusting your sector filter or refresh the data"
       }
     },
+    "recentAnalyses": {
+      "title": "Recent Analyses",
+      "subtitle": "Track all AI-generated investment analyses and their performance",
+      "refresh": "Refresh",
+      "loading": "Loading recent analyses...",
+      "tryAgain": "Try Again",
+      "searchPlaceholder": "Search by ticker or reasoning...",
+      "allSignals": "All Signals",
+      "stats": {
+        "totalAnalyses": "Total Analyses",
+        "positiveChanges": "Positive Changes",
+        "negativeChanges": "Negative Changes",
+        "avgConfidence": "Avg Confidence"
+      },
+      "results": {
+        "analysisCount": "{{count}} Analysis{{plural}}",
+        "matching": "matching \"{{term}}\"",
+        "withSignal": "with {{signal}} signal",
+        "confidence": "Confidence:",
+        "agents": "{{count}} agent{{plural}}",
+        "current": "Current:",
+        "initial": "Initial:",
+        "bullish": "bullish",
+        "bearish": "bearish"
+      },
+      "emptyStates": {
+        "noResultsTitle": "No analyses found",
+        "noResultsDescription": "Try adjusting your search terms or filters.",
+        "noDataTitle": "No analyses yet",
+        "noDataDescription": "Run your first analysis to see results here.",
+        "startAnalysis": "Start Analysis"
+      }
+    },
+    "agents": {
+      "title": "AI Investment Masters",
+      "subtitle": "17 World-Class Investment Experts at Your Service",
+      "searchPlaceholder": "Search by name, style, or description...",
+      "allStyles": "All Styles",
+      "viewProfile": "View Full Profile",
+      "badges": {
+        "experts": "17 Experts",
+        "styles": "6 Investment Styles", 
+        "strategies": "Multiple Strategies"
+      },
+      "footer": {
+        "educational": "Educational Purpose Only",
+        "principles": "Based on Real Investment Principles",
+        "aiPowered": "AI-Powered Analysis"
+      },
+      "modal": {
+        "biography": "Biography",
+        "overview": "Overview", 
+        "philosophy": "Investment Philosophy",
+        "trackRecord": "Track Record",
+        "exampleAnalyses": "Example Analyses",
+        "focusAreas": "Key Focus Areas",
+        "primaryMetrics": "Primary Metrics",
+        "analysisMethods": "Analysis Methods",
+        "strengths": "Strengths",
+        "limitations": "Limitations"
+      },
+      "investmentStyles": {
+        "value": {
+          "name": "Value Investing",
+          "description": "Find undervalued quality companies and hold long-term"
+        },
+        "growth": {
+          "name": "Growth Investing",
+          "description": "Invest in companies and industries with high growth potential"
+        },
+        "macro": {
+          "name": "Macro Investing",
+          "description": "Investment strategy based on macroeconomic trends"
+        },
+        "activist": {
+          "name": "Activist Investing",
+          "description": "Actively engage in corporate governance to unlock value"
+        },
+        "analyst": {
+          "name": "Professional Analysis",
+          "description": "Based on professional techniques and data analysis"
+        },
+        "risk": {
+          "name": "Risk Management",
+          "description": "Focus on risk control and capital protection"
+        }
+      },
+      "agentData": {
+        "trackRecord": "Track Record",
+        "caseStudies": "Case Studies",
+        "specialties": "Specialties"
+      }
+    },
     "signals": {
       "STRONG BUY": "STRONG BUY",
       "BUY": "BUY",
@@ -232,35 +325,6 @@
       "risk": {
         "name": "Risk Management",
         "description": "Focus on risk assessment and portfolio optimization"
-      }
-    },
-    "agents": {
-      "categories": {
-        "macro": "Macro Investing",
-        "value": "Value Investing",
-        "activist": "Activist Investing",
-        "growth": "Growth Investing",
-        "analyst": "Professional Analysis",
-        "risk": "Risk Management"
-      },
-      "styles": {
-        "aswath_damodaran": "Valuation expert, balancing stories and numbers",
-        "ben_graham": "Father of value investing, margin of safety theory",
-        "bill_ackman": "Activist investor, courageously driving change",
-        "cathie_wood": "Queen of disruptive innovation, tech growth expert",
-        "charlie_munger": "Rational thinker, fair price for wonderful companies",
-        "michael_burry": "The Big Short contrarian investor, deep value excavation",
-        "peter_lynch": "Ten-bagger hunter, everyday business growth investing",
-        "philip_fisher": "Precision growth investor, deep research expert",
-        "rakesh_jhunjhunwala": "The Big Bull of India, bold position taking",
-        "stanley_druckenmiller": "Macro investing legend, asymmetric opportunity hunter",
-        "warren_buffett": "Oracle of Omaha, finding reasonable prices for excellent companies",
-        "technical_analyst": "Chart pattern expert, technical indicator analysis",
-        "fundamentals_analyst": "Financial statement expert, corporate valuation",
-        "sentiment_analyst": "Market sentiment expert, investor psychology analysis",
-        "valuation_analyst": "Company valuation expert, intrinsic value calculation",
-        "risk_manager": "Risk management expert, investment risk assessment",
-        "portfolio_manager": "Portfolio expert, asset allocation optimization"
       }
     }
   }
