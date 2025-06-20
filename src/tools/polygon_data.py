@@ -921,117 +921,84 @@ def _map_transaction_type(code: Optional[str]) -> str:
 def get_day_gainers(count: int = 10) -> List[Dict[str, Any]]:
     """
     Fetch day gainers using Polygon.io's Grouped Daily endpoint.
-    
-    Args:
-        count: Number of gainers to return (default: 10, max: 50)
-    
-    Returns:
-        List of dictionaries containing stock data compatible with TrendingStock format
+    If no data is found (e.g., holiday), fallback to previous days (up to 7 days).
     """
-    from datetime import datetime
+    from datetime import datetime, timedelta
+    import requests
     current_date = datetime.now().strftime('%Y-%m-%d')
     cache_key = f"polygon_day_gainers_{count}_{current_date}"
-    
     # Check cache first  
     if cached_data := _cache.get_trending_stocks(cache_key):
         logger.info(f"Cache HIT for polygon_day_gainers: {cache_key}")
         return cached_data
-
     logger.info(f"Cache MISS for polygon_day_gainers: {cache_key}")
-    
     try:
         _rate_limit()
-        
-        import requests
-        from datetime import datetime, timedelta
-        
-        # Get the most recent trading day (excluding weekends)
         today = datetime.now()
-        days_back = 1
-        while days_back <= 7:  # Look back up to a week for trading day
+        for days_back in range(0, 7):  # Try today, then up to 6 previous days
             check_date = today - timedelta(days=days_back)
             # Skip weekends
-            if check_date.weekday() < 5:  # Monday = 0, Friday = 4
-                trading_date = check_date.strftime('%Y-%m-%d')
-                break
-            days_back += 1
-        else:
-            # Fallback to yesterday if no trading day found
-            trading_date = (today - timedelta(days=1)).strftime('%Y-%m-%d')
-        
-        # Use Polygon's grouped daily endpoint for market data
-        url = f"https://api.polygon.io/v2/aggs/grouped/locale/us/market/stocks/{trading_date}"
-        params = {
-            "adjusted": "true",
-            "apikey": POLYGON_API_KEY
-        }
-        
-        response = requests.get(url, params=params)
-        if response.status_code != 200:
-            logger.error(f"Polygon grouped daily API error: {response.status_code} - {response.text}")
-            return []
-        
-        data = response.json()
-        
-        if not data.get('results'):
-            logger.warning(f"No results from Polygon grouped daily for {trading_date}")
-            return []
-        
-        logger.info(f"Processing {len(data['results'])} stocks from Polygon for {trading_date}")
-        
-        # Filter and sort by percent change to get gainers
-        gainers = []
-        for result in data['results']:
-            try:
-                # Get price data
-                open_price = result.get('o', 0)
-                close_price = result.get('c', 0)
-                high_price = result.get('h', 0)
-                low_price = result.get('l', 0)
-                volume = result.get('v', 0)
-                ticker = result.get('T', '')
-                
-                if open_price > 0 and close_price > 0:
-                    change = close_price - open_price
-                    change_percent = (change / open_price) * 100
-                    
-                    # Only include gainers with significant movement (> 2%) and decent volume
-                    if change_percent > 2.0 and volume > 100000:
-                        # Filter out non-standard tickers (options, warrants, etc.)
-                        if len(ticker) <= 5 and ticker.isalpha() and ticker.isupper():
-                            stock_data = {
-                                "symbol": ticker,
-                                "company_name": ticker,  # Will try to enhance later
-                                "price": float(close_price),
-                                "change": float(change),
-                                "change_percent": float(change_percent),
-                                "volume": int(volume),
-                                "market_cap": 0,  # Will be enhanced if available
-                                "sector": None,
-                                "exchange": "US",
-                                "fifty_two_week_high": float(high_price),
-                                "fifty_two_week_low": float(low_price),
-                                "pe_ratio": None,
-                                "book_value": None
-                            }
-                            gainers.append(stock_data)
-                        
-            except (ValueError, TypeError, KeyError) as e:
-                logger.warning(f"Error processing ticker data: {e}")
+            if check_date.weekday() >= 5:
                 continue
-        
-        # Sort by percent change (highest first) and limit count
-        gainers.sort(key=lambda x: x['change_percent'], reverse=True)
-        top_gainers = gainers[:min(count, 50)]
-        
-        logger.info(f"Found {len(top_gainers)} gainers after filtering and sorting")
-        
-        # Cache the results for 24 hours with date in key for daily invalidation
-        _cache.set_trending_stocks(cache_key, top_gainers)
-        logger.info(f"Cached polygon_day_gainers for: {cache_key}, got {len(top_gainers)} gainers")
-        
-        return top_gainers
-        
+            trading_date = check_date.strftime('%Y-%m-%d')
+            url = f"https://api.polygon.io/v2/aggs/grouped/locale/us/market/stocks/{trading_date}"
+            params = {
+                "adjusted": "true",
+                "apikey": POLYGON_API_KEY
+            }
+            logger.info(f"Fetching day gainers from Polygon for {trading_date}")
+            response = requests.get(url, params=params)
+            if response.status_code != 200:
+                logger.error(f"Polygon grouped daily API error: {response.status_code} - {response.text}")
+                continue
+            data = response.json()
+            if not data.get('results'):
+                logger.warning(f"No results from Polygon grouped daily for {trading_date}, trying previous day...")
+                continue
+            logger.info(f"Processing {len(data['results'])} stocks from Polygon for {trading_date}")
+            gainers = []
+            for result in data['results']:
+                try:
+                    open_price = result.get('o', 0)
+                    close_price = result.get('c', 0)
+                    high_price = result.get('h', 0)
+                    low_price = result.get('l', 0)
+                    volume = result.get('v', 0)
+                    ticker = result.get('T', '')
+                    if open_price > 0 and close_price > 0:
+                        change = close_price - open_price
+                        change_percent = (change / open_price) * 100
+                        if change_percent > 2.0 and volume > 100000:
+                            if len(ticker) <= 5 and ticker.isalpha() and ticker.isupper():
+                                stock_data = {
+                                    "symbol": ticker,
+                                    "company_name": ticker,
+                                    "price": float(close_price),
+                                    "change": float(change),
+                                    "change_percent": float(change_percent),
+                                    "volume": int(volume),
+                                    "market_cap": 0,
+                                    "sector": None,
+                                    "exchange": "US",
+                                    "fifty_two_week_high": float(high_price),
+                                    "fifty_two_week_low": float(low_price),
+                                    "pe_ratio": None,
+                                    "book_value": None
+                                }
+                                gainers.append(stock_data)
+                except (ValueError, TypeError, KeyError) as e:
+                    logger.warning(f"Error processing ticker data: {e}")
+                    continue
+            gainers.sort(key=lambda x: x['change_percent'], reverse=True)
+            top_gainers = gainers[:min(count, 50)]
+            if top_gainers:
+                logger.info(f"Found {len(top_gainers)} gainers after filtering and sorting for {trading_date}")
+                # Cache the results for 24 hours with date in key for daily invalidation
+                _cache.set_trending_stocks(cache_key, top_gainers)
+                logger.info(f"Cached polygon_day_gainers for: {cache_key}, got {len(top_gainers)} gainers")
+                return top_gainers
+        logger.warning("No gainers found in the last 7 days.")
+        return []
     except Exception as e:
         logger.error(f"Error fetching Polygon.io day gainers: {e}")
         return []

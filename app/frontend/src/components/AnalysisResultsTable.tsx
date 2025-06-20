@@ -86,6 +86,24 @@ export function AnalysisResultsTable({
     }
   };
 
+  // Add a helper for signal text color
+  const getSignalTextColor = (signal: string) => {
+    switch (signal?.toLowerCase()) {
+      case 'buy':
+      case 'long':
+      case 'bullish':
+        return 'text-green-600 dark:text-green-400';
+      case 'sell':
+      case 'short':
+      case 'bearish':
+        return 'text-red-600 dark:text-red-400';
+      case 'hold':
+        return 'text-yellow-700 dark:text-yellow-400';
+      default:
+        return 'text-gray-600 dark:text-gray-400';
+    }
+  };
+
   // Export results
   const handleExportResults = () => {
     if (!outputNodeData) return;
@@ -234,7 +252,7 @@ export function AnalysisResultsTable({
                                     className="flex items-center gap-1"
                                   >
                                     {getActionIcon(agentResults.signal)}
-                                    {t(`signals.${agentResults.signal?.toUpperCase()}`)}
+                                    <span className={getSignalTextColor(agentResults.signal || '')}>{t(`signals.${agentResults.signal?.toUpperCase()}`)}</span>
                                   </Badge>
                                   {agentResults.confidence && (
                                     <span className="text-xs text-muted-foreground">
@@ -347,7 +365,7 @@ export function AnalysisResultsTable({
                                   className="flex items-center gap-1"
                                 >
                                   {getActionIcon(agentResults.signal)}
-                                  {t(`signals.${agentResults.signal?.toUpperCase()}`)}
+                                  <span className={getSignalTextColor(agentResults.signal || '')}>{t(`signals.${agentResults.signal?.toUpperCase()}`)}</span>
                                 </Badge>
                               </div>
                               {agentResults.confidence && (
@@ -411,7 +429,7 @@ export function AnalysisResultsTable({
                             const agentResults = agentSignals[fullAgentKey]?.[ticker];
                             return (
                               <TableCell key={agentKey}>
-                                {t(`signals.${agentResults?.signal?.toUpperCase()}`)}
+                                <span className={getSignalTextColor(agentResults?.signal || '')}>{t(`signals.${agentResults?.signal?.toUpperCase()}`)}</span>
                               </TableCell>
                             );
                           })}

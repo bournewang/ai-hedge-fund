@@ -31,6 +31,25 @@ def safe_float(value, default=0.0):
         return default
 
 
+def safe_round_confidence(confidence, default=50):
+    """
+    Safely round confidence value to integer percentage, handling NaN cases
+    
+    Args:
+        confidence: The confidence value to convert (0.0 to 1.0)
+        default: Default percentage to return if confidence is NaN or invalid
+    
+    Returns:
+        int: The confidence as integer percentage or default if NaN/invalid
+    """
+    try:
+        if pd.isna(confidence) or np.isnan(confidence):
+            return default
+        return round(float(confidence) * 100)
+    except (ValueError, TypeError, OverflowError):
+        return default
+
+
 ##### Technical Analyst #####
 def technical_analyst_agent(state: AgentState):
     """
@@ -105,31 +124,31 @@ def technical_analyst_agent(state: AgentState):
         # Generate detailed analysis report for this ticker
         technical_analysis[ticker] = {
             "signal": combined_signal["signal"],
-            "confidence": round(combined_signal["confidence"] * 100),
+            "confidence": safe_round_confidence(combined_signal["confidence"]),
             "strategy_signals": {
                 "trend_following": {
                     "signal": trend_signals["signal"],
-                    "confidence": round(trend_signals["confidence"] * 100),
+                    "confidence": safe_round_confidence(trend_signals["confidence"]),
                     "metrics": normalize_pandas(trend_signals["metrics"]),
                 },
                 "mean_reversion": {
                     "signal": mean_reversion_signals["signal"],
-                    "confidence": round(mean_reversion_signals["confidence"] * 100),
+                    "confidence": safe_round_confidence(mean_reversion_signals["confidence"]),
                     "metrics": normalize_pandas(mean_reversion_signals["metrics"]),
                 },
                 "momentum": {
                     "signal": momentum_signals["signal"],
-                    "confidence": round(momentum_signals["confidence"] * 100),
+                    "confidence": safe_round_confidence(momentum_signals["confidence"]),
                     "metrics": normalize_pandas(momentum_signals["metrics"]),
                 },
                 "volatility": {
                     "signal": volatility_signals["signal"],
-                    "confidence": round(volatility_signals["confidence"] * 100),
+                    "confidence": safe_round_confidence(volatility_signals["confidence"]),
                     "metrics": normalize_pandas(volatility_signals["metrics"]),
                 },
                 "statistical_arbitrage": {
                     "signal": stat_arb_signals["signal"],
-                    "confidence": round(stat_arb_signals["confidence"] * 100),
+                    "confidence": safe_round_confidence(stat_arb_signals["confidence"]),
                     "metrics": normalize_pandas(stat_arb_signals["metrics"]),
                 },
             },
@@ -173,7 +192,7 @@ def calculate_trend_signals(prices_df):
     medium_trend = ema_21 > ema_55
 
     # Combine signals with confidence weighting
-    trend_strength = adx["adx"].iloc[-1] / 100.0
+    trend_strength = safe_float(adx["adx"].iloc[-1]) / 100.0
 
     if short_trend.iloc[-1] and medium_trend.iloc[-1]:
         signal = "bullish"
@@ -381,7 +400,7 @@ def weighted_signal_combination(signals, weights):
     for strategy, signal in signals.items():
         numeric_signal = signal_values[signal["signal"]]
         weight = weights[strategy]
-        confidence = signal["confidence"]
+        confidence = safe_float(signal["confidence"], 0.5)
 
         weighted_sum += numeric_signal * weight * confidence
         total_confidence += weight * confidence
@@ -400,7 +419,7 @@ def weighted_signal_combination(signals, weights):
     else:
         signal = "neutral"
 
-    return {"signal": signal, "confidence": abs(final_score)}
+    return {"signal": signal, "confidence": safe_float(abs(final_score), 0.5)}
 
 
 def normalize_pandas(obj):
