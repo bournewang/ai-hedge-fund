@@ -1,8 +1,15 @@
 import { Gem } from 'lucide-react';
+import { SEO } from './SEO';
 
 export function ValuePicksPage() {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <>
+      <SEO
+        title="Value Picks"
+        description="Long-term value investments from our AI analysts."
+        url="https://freeaiinvestment.com/value-picks"
+      />
+      <div className="min-h-screen bg-gray-50">
       <div className="bg-gradient-to-br from-blue-600 to-purple-700 text-white py-12">
         <div className="max-w-6xl mx-auto px-4">
           <div className="text-center space-y-4">
@@ -23,6 +30,6 @@ export function ValuePicksPage() {
           <p className="text-gray-500">Value picks dashboard will be available soon</p>
         </div>
       </div>
-    </div>
+    </>
   );
-} 
+}

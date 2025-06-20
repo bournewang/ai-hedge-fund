@@ -14,6 +14,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useLanguage } from '@/hooks/useLanguage';
+import { SEO } from './SEO';
 
 export function AgentsDescription() {
   const { t } = useLanguage();
@@ -46,7 +47,13 @@ export function AgentsDescription() {
   }, [selectedAgent, agents]);
 
   return (
-    <div className="min-h-screen bg-background">
+    <>
+      <SEO
+        title="Meet the 17 Legendary AI Investment Agents"
+        description="Meet 17 legendary investor personas behind our AI — each with a unique investing style powering your stock analysis."
+        url="https://freeaiinvestment.com/agents"
+      />
+      <div className="min-h-screen bg-background">
       {/* Hero Section */}
       <div className="bg-gradient-to-br from-blue-600 to-purple-700 text-white py-16">
         <div className="max-w-6xl mx-auto px-4">
@@ -360,5 +367,6 @@ export function AgentsDescription() {
         </DialogContent>
       </Dialog>
     </div>
+    </>
   );
-} 
+}

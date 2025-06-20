@@ -11,6 +11,7 @@ import { api } from '@/services/api';
 import { tickerSymbolsService } from '@/services/tickerSymbols';
 import { useLanguage } from '@/hooks/useLanguage';
 import { AnalysisResults } from './AnalysisResults';
+import { SEO } from './SEO';
 
 type InvestmentStyle = keyof typeof investmentStyles;
 
@@ -302,7 +303,13 @@ export function AnalysisForm({ onAnalysisStart }: AnalysisFormProps) {
   const recommendedAgents = getRecommendedAgents(selectedStyle);
 
   return (
-    <div className="w-full bg-background">
+    <>
+      <SEO
+        title="AI Stock Analyzer: Get Instant Buy, Sell, Hold Signals"
+        description="Instantly analyze any stock with AI and receive precise BUY, SELL, or HOLD signals to guide your trading decisions."
+        url="https://freeaiinvestment.com/analysis"
+      />
+      <div className="w-full bg-background">
       <div className="max-w-6xl mx-auto p-4 md:p-6 space-y-6">
         {/* 页面标题和重置按钮 */}
         <div className="flex justify-between items-center">
@@ -640,6 +647,7 @@ export function AnalysisForm({ onAnalysisStart }: AnalysisFormProps) {
           isAnalyzing={isAnalyzing}
         />
       </div>
-    </div>
+      </div>
+    </>
   );
-} 
+}

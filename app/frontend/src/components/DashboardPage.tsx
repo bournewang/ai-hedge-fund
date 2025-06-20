@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
+import { SEO } from './SEO';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -197,7 +198,13 @@ export function DashboardPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-background">
+    <>
+      <SEO
+        title="AI Investment: Market Trends & Trading Signals"
+        description="Get a real-time overview of AI-driven investment signals, market insights, and trending U.S. stocks."
+        url="https://freeaiinvestment.com/"
+      />
+      <div className="min-h-screen bg-background">
       {/* Hero Section */}
       <div className="bg-gradient-to-br from-blue-600 via-purple-600 to-green-600 text-white">
         <div className="max-w-6xl mx-auto px-4 py-16">
@@ -488,6 +495,7 @@ export function DashboardPage() {
           </CardContent>
         </Card>
       </div>
-    </div>
+      </div>
+    </>
   );
-} 
+}
