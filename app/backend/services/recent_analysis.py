@@ -2,7 +2,7 @@
 
 import logging
 from datetime import datetime, timedelta
-from typing import Dict, List, Any, Optional
+from typing import Dict, List, Any
 from src.data.cache import get_cache
 from src.tools.polygon_data import get_latest_price_polygon
 
@@ -47,13 +47,8 @@ def save_analysis_result(
             else:
                 signal = "HOLD"
             
-            # Get current price for performance tracking
-            try:
-                current_price_obj = get_latest_price_polygon(ticker)
-                initial_price = current_price_obj.close if current_price_obj else None
-            except Exception as e:
-                logger.warning(f"Could not fetch current price for {ticker}: {e}")
-                initial_price = None
+            # Initial price no longer fetched at analysis time to reduce latency
+            initial_price = None
             
             # Count agent signals for this ticker
             agent_count = 0

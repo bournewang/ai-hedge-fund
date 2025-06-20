@@ -287,11 +287,11 @@ export function RecentAnalysesPage() {
                             {t('recentAnalyses.results.current')} ${analysis.current_price.toFixed(2)}
                           </div>
                         )}
-                        {analysis.initial_price && (
+                        {/* {analysis.initial_price && (
                           <div className="text-sm text-muted-foreground">
                             {t('recentAnalyses.results.initial')} ${analysis.initial_price.toFixed(2)}
                           </div>
-                        )}
+                        )} */}
                         
                         {/* Agent Breakdown */}
                         <div className="flex items-center gap-2 mt-2 lg:justify-end">
