@@ -3,7 +3,7 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Search, BookOpen, TrendingUp, Users, BarChart3, Info, Award, Calendar, Star } from 'lucide-react';
+import { Search, BookOpen, TrendingUp, Users, BarChart3, Info, Calendar} from 'lucide-react';
 import { getAgents, getInvestmentStyles } from '@/data/agents';
 import { Button } from '@/components/ui/button';
 import {
