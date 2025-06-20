@@ -8,7 +8,15 @@ import { RecentAnalysesPage } from './components/RecentAnalysesPage';
 // import { ValuePicksPage } from './components/ValuePicksPage';
 import { Layout } from './components/Layout';
 import { Button } from './components/ui/button';
-import { Users, TrendingUp, Home, BarChart3, Clock } from 'lucide-react';
+import {
+  Users,
+  TrendingUp,
+  Home,
+  BarChart3,
+  Clock,
+  Menu,
+} from 'lucide-react';
+import { Sheet, SheetTrigger, SheetContent } from './components/ui/sheet';
 import { ThemeToggle } from './components/ui/theme-toggle';
 import { LanguageSwitcher } from './components/LanguageSwitcher';
 import { useLanguage } from './hooks/useLanguage';
@@ -29,18 +37,50 @@ function Navigation() {
 
   return (
     <div className="bg-background border-b">
-      <div className="max-w-6xl mx-auto px-4 py-4">
+      <div className="max-w-6xl mx-auto px-4 py-3">
         <div className="flex items-center justify-between">
-          <Link to="/" className="text-xl font-bold text-primary">{t('navigation.brandTitle')}</Link>
           <div className="flex items-center gap-2">
+            <Link to="/" className="text-lg font-bold text-primary sm:text-xl">
+              {t('navigation.brandTitle')}
+            </Link>
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="icon" className="sm:hidden">
+                  <Menu className="h-4 w-4" />
+                  <span className="sr-only">Open menu</span>
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="left" className="sm:hidden">
+                <nav className="mt-6 flex flex-col gap-1">
+                  {navItems.map((item) => {
+                    const Icon = item.icon;
+                    const isActive = location.pathname === item.path;
+                    return (
+                      <Link key={item.path} to={item.path}>
+                        <Button
+                          variant={isActive ? 'secondary' : 'ghost'}
+                          className="w-full justify-start gap-2"
+                        >
+                          <Icon className="h-4 w-4" />
+                          {item.label}
+                        </Button>
+                      </Link>
+                    );
+                  })}
+                </nav>
+              </SheetContent>
+            </Sheet>
+          </div>
+
+          <div className="hidden sm:flex flex-wrap items-center gap-1">
             {navItems.map((item) => {
               const Icon = item.icon;
               const isActive = location.pathname === item.path;
               return (
                 <Link key={item.path} to={item.path}>
-                  <Button 
-                    variant={isActive ? "secondary" : "ghost"} 
-                    className="flex items-center gap-2 text-foreground hover:text-foreground"
+                  <Button
+                    variant={isActive ? 'secondary' : 'ghost'}
+                    className="flex items-center gap-1 h-9 px-4 text-sm text-foreground hover:text-foreground"
                   >
                     <Icon className="h-4 w-4" />
                     {item.label}

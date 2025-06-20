@@ -8,7 +8,7 @@ type LayoutProps = {
 
 export function Layout({ children }: LayoutProps) {
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-background">
+    <div className="flex h-screen w-full overflow-hidden bg-background">
       <ReactFlowProvider>
         <FlowProvider>
           {/* Main content area takes full width */}
