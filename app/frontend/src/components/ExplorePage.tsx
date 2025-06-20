@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { api, TrendingStock } from '@/services/api';
 import { useLanguage } from '@/hooks/useLanguage';
+import { SEO } from './SEO';
 
 export function ExplorePage() {
   const navigate = useNavigate();
@@ -105,32 +106,52 @@ export function ExplorePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center">
-          <RefreshCw className="w-8 h-8 animate-spin mx-auto mb-4" />
-          <p className="text-lg">{t('explore.loadingStocks')}</p>
+      <>
+        <SEO
+          title="Explore Trending Stocks"
+          description="Discover today's top gainers and build your analysis portfolio."
+          url="https://freeaiinvestment.com/explore"
+        />
+        <div className="min-h-screen bg-background flex items-center justify-center">
+          <div className="text-center">
+            <RefreshCw className="w-8 h-8 animate-spin mx-auto mb-4" />
+            <p className="text-lg">{t('explore.loadingStocks')}</p>
+          </div>
         </div>
-      </div>
+      </>
     );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center">
-          <AlertCircle className="w-8 h-8 text-red-500 mx-auto mb-4" />
-          <p className="text-lg text-red-600 mb-4">{t('explore.fetchError')}</p>
-          <Button onClick={fetchTrendingData}>
-            <RefreshCw className="w-4 h-4 mr-2" />
-            {t('explore.tryAgain')}
-          </Button>
+      <>
+        <SEO
+          title="Explore Trending Stocks"
+          description="Discover today's top gainers and build your analysis portfolio."
+          url="https://freeaiinvestment.com/explore"
+        />
+        <div className="min-h-screen bg-background flex items-center justify-center">
+          <div className="text-center">
+            <AlertCircle className="w-8 h-8 text-red-500 mx-auto mb-4" />
+            <p className="text-lg text-red-600 mb-4">{t('explore.fetchError')}</p>
+            <Button onClick={fetchTrendingData}>
+              <RefreshCw className="w-4 h-4 mr-2" />
+              {t('explore.tryAgain')}
+            </Button>
+          </div>
         </div>
-      </div>
+      </>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <>
+      <SEO
+        title="Explore Trending Stocks"
+        description="Discover today's top gainers and build your analysis portfolio."
+        url="https://freeaiinvestment.com/explore"
+      />
+      <div className="min-h-screen bg-background">
       {/* Hero Section */}
       <div className="bg-gradient-to-br from-green-600 to-blue-700 text-white py-12">
         <div className="max-w-6xl mx-auto px-4">
@@ -402,6 +423,6 @@ export function ExplorePage() {
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
-} 
+}
