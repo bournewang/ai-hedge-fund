@@ -30,6 +30,7 @@ export function MonitoringPage() {
           <p className="text-muted-foreground">Monitoring dashboard will be available soon</p>
         </div>
       </div>
+      </div>
     </>
   );
 }

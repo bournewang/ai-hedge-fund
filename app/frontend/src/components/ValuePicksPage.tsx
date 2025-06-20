@@ -30,6 +30,7 @@ export function ValuePicksPage() {
           <p className="text-gray-500">Value picks dashboard will be available soon</p>
         </div>
       </div>
+      </div>
     </>
   );
 }
