@@ -304,13 +304,7 @@
       "BEARISH": "看跌",
       "NEUTRAL": "中性",
       "SHORT": "做空",
-      "LONG": "做多",
-      "hold": "持有",
-      "bullish": "看涨",
-      "bearish": "看跌",
-      "neutral": "中性",
-      "short": "做空",
-      "long": "做多"
+      "LONG": "做多"
     },
     "investmentStyles": {
       "value": {

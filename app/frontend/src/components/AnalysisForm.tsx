@@ -48,6 +48,9 @@ export function AnalysisForm({ onAnalysisStart }: AnalysisFormProps) {
   const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState<number>(-1);
   const [isLoadingSymbols, setIsLoadingSymbols] = useState(false);
   
+  // Add new state for ticker limit warning
+  const [tickerLimitWarning, setTickerLimitWarning] = useState(false);
+  
   const nodeContext = useNodeContext();
   const { t } = useLanguage();
 
@@ -103,13 +106,16 @@ export function AnalysisForm({ onAnalysisStart }: AnalysisFormProps) {
       }
     });
 
+    // Reset warning if under limit
+    if (validTickers.length <= 5 && tickerLimitWarning) setTickerLimitWarning(false);
+
     return {
       valid: validTickers,
       invalid: invalidTickers,
-      isValid: invalidTickers.length === 0 && validTickers.length > 0,
+      isValid: invalidTickers.length === 0 && validTickers.length > 0 && validTickers.length <= 5,
       isEmpty: tickerList.length === 0
     };
-  }, [tickers]);
+  }, [tickers, tickerLimitWarning]);
 
   // Handle ticker input changes and search suggestions
   const handleTickerInputChange = useCallback(async (value: string) => {
@@ -136,11 +142,13 @@ export function AnalysisForm({ onAnalysisStart }: AnalysisFormProps) {
   const handleAddTicker = useCallback((symbol: string) => {
     const upperSymbol = symbol.toUpperCase();
     const currentTickers = tickers.split(',').map(t => t.trim().toUpperCase()).filter(Boolean);
-    
+    if (currentTickers.length >= 5) {
+      setTickerLimitWarning(true);
+      return;
+    }
     if (!currentTickers.includes(upperSymbol)) {
       setTickers(prev => prev ? `${prev},${upperSymbol}` : upperSymbol);
     }
-    
     setTickerInput('');
     setShowSuggestions(false);
   }, [tickers]);
@@ -225,6 +233,10 @@ export function AnalysisForm({ onAnalysisStart }: AnalysisFormProps) {
   // 添加股票到输入框
   const handleAddStock = useCallback((symbol: string) => {
     const currentTickers = tickers.split(',').map(t => t.trim().toUpperCase()).filter(Boolean);
+    if (currentTickers.length >= 5) {
+      setTickerLimitWarning(true);
+      return;
+    }
     if (!currentTickers.includes(symbol)) {
       setTickers(prev => prev ? `${prev},${symbol}` : symbol);
     }
@@ -449,6 +461,16 @@ export function AnalysisForm({ onAnalysisStart }: AnalysisFormProps) {
                     </div>
                   </div>
                 )}
+
+                {/* Ticker limit warning */}
+                {tickerLimitWarning && (
+                  <div className="flex items-center gap-2 p-3 border border-amber-300 dark:border-amber-700 bg-amber-100 dark:bg-amber-950/40 rounded-lg">
+                    <AlertCircle className="h-4 w-4 text-amber-700 dark:text-amber-300 flex-shrink-0" />
+                    <div className="text-sm text-amber-800 dark:text-amber-200">
+                      {t('analysisForm.step1.tickerLimitWarning', { max: 5 })}
+                    </div>
+                  </div>
+                )}                
 
                 {/* 热门股票推荐 */}
                 <div className="space-y-2">

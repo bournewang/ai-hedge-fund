@@ -59,14 +59,14 @@ export function AnalysisResultsTable({
     switch (action?.toLowerCase()) {
       case 'buy':
       case 'long':
-        return <TrendingUp className="h-4 w-4 text-green-600 dark:text-green-400" />;
+        return <TrendingUp className="h-4 w-4 text-green-200 dark:text-green-100" />;
       case 'sell':
       case 'short':
-        return <TrendingDown className="h-4 w-4 text-red-600 dark:text-red-400" />;
+        return <TrendingDown className="h-4 w-4 text-red-200 dark:text-red-100" />;
       case 'hold':
-        return <Minus className="h-4 w-4 text-yellow-600 dark:text-yellow-400" />;
+        return <Minus className="h-4 w-4 text-yellow-200 dark:text-yellow-100" />;
       default:
-        return <BarChart3 className="h-4 w-4 text-gray-400 dark:text-gray-500" />;
+        return <BarChart3 className="h-4 w-4 text-gray-600 dark:text-gray-400" />;
     }
   };
 
@@ -209,7 +209,7 @@ export function AnalysisResultsTable({
                                 className="flex items-center gap-1 w-fit"
                               >
                                 {getActionIcon(decision.action)}
-                                {t(`signals.${decision.action}`)}
+                                {t(`signals.${decision.action?.toUpperCase()}`)}
                               </Badge>
                               {decision.confidence && (
                                 <span className="text-xs text-muted-foreground">
@@ -234,7 +234,7 @@ export function AnalysisResultsTable({
                                     className="flex items-center gap-1"
                                   >
                                     {getActionIcon(agentResults.signal)}
-                                    {t(`signals.${agentResults.signal}`)}
+                                    {t(`signals.${agentResults.signal?.toUpperCase()}`)}
                                   </Badge>
                                   {agentResults.confidence && (
                                     <span className="text-xs text-muted-foreground">
@@ -289,7 +289,7 @@ export function AnalysisResultsTable({
                             className="flex items-center gap-1"
                           >
                             {getActionIcon(decision.action)}
-                            {t(`signals.${decision.action}`)}
+                            {t(`signals.${decision.action?.toUpperCase()}`)}
                             {decision.confidence && ` (${decision.confidence}%)`}
                           </Badge>
                         )}
@@ -347,7 +347,7 @@ export function AnalysisResultsTable({
                                   className="flex items-center gap-1"
                                 >
                                   {getActionIcon(agentResults.signal)}
-                                  {t(`signals.${agentResults.signal}`)}
+                                  {t(`signals.${agentResults.signal?.toUpperCase()}`)}
                                 </Badge>
                               </div>
                               {agentResults.confidence && (
@@ -403,7 +403,7 @@ export function AnalysisResultsTable({
                       return (
                         <TableRow key={ticker}>
                           <TableCell className="font-mono">{ticker}</TableCell>
-                          <TableCell>{t(`signals.${decision?.action}`)}</TableCell>
+                          <TableCell>{t(`signals.${decision?.action?.toUpperCase()}`)}</TableCell>
                           <TableCell>{decision?.confidence ? `${decision.confidence}%` : 'N/A'}</TableCell>
                           <TableCell className="max-w-xs truncate">{decision?.reasoning || 'N/A'}</TableCell>
                           {selectedAgents.map(agentKey => {
@@ -411,7 +411,7 @@ export function AnalysisResultsTable({
                             const agentResults = agentSignals[fullAgentKey]?.[ticker];
                             return (
                               <TableCell key={agentKey}>
-                                {t(`signals.${agentResults?.signal}`)}
+                                {t(`signals.${agentResults?.signal?.toUpperCase()}`)}
                               </TableCell>
                             );
                           })}

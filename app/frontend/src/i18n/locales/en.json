@@ -304,13 +304,7 @@
       "BEARISH": "BEARISH",
       "NEUTRAL": "NEUTRAL",
       "SHORT": "SHORT",
-      "LONG": "LONG",
-      "hold": "HOLD",
-      "bullish": "BULLISH",
-      "bearish": "BEARISH",
-      "neutral": "NEUTRAL",
-      "short": "SHORT",
-      "long": "LONG"
+      "LONG": "LONG"
     },
     "investmentStyles": {
       "value": {
