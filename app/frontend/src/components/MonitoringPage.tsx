@@ -1,8 +1,15 @@
 import { Eye } from 'lucide-react';
+import { SEO } from './SEO';
 
 export function MonitoringPage() {
   return (
-    <div className="min-h-screen bg-background">
+    <>
+      <SEO
+        title="Monitoring Dashboard"
+        description="Track volatile stocks and your watchlist."
+        url="https://freeaiinvestment.com/monitoring"
+      />
+      <div className="min-h-screen bg-background">
       <div className="bg-gradient-to-br from-purple-600 to-blue-700 text-white py-12">
         <div className="max-w-6xl mx-auto px-4">
           <div className="text-center space-y-4">
@@ -23,6 +30,6 @@ export function MonitoringPage() {
           <p className="text-muted-foreground">Monitoring dashboard will be available soon</p>
         </div>
       </div>
-    </div>
+    </>
   );
-} 
+}

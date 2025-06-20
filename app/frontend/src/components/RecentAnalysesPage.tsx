@@ -3,7 +3,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { api, RecentAnalysis } from '@/services/api';
-import { 
+import {
   Clock, 
   TrendingUp, 
   TrendingDown, 
@@ -16,6 +16,7 @@ import {
   Search
 } from 'lucide-react';
 import { useLanguage } from '@/hooks/useLanguage';
+import { SEO } from './SEO';
 
 export function RecentAnalysesPage() {
   const { t } = useLanguage();
@@ -84,7 +85,13 @@ export function RecentAnalysesPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <>
+      <SEO
+        title="Recent Analyses"
+        description="Track all AI generated stock analyses and their performance."
+        url="https://freeaiinvestment.com/recent-analyses"
+      />
+      <div className="min-h-screen bg-background">
       {/* Header */}
       <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white">
         <div className="max-w-6xl mx-auto px-4 py-8">
@@ -333,6 +340,6 @@ export function RecentAnalysesPage() {
           </>
         )}
       </div>
-    </div>
+    </>
   );
-} 
+}
