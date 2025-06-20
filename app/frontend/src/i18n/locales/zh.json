@@ -12,7 +12,7 @@
       "search": "搜索"
     },
     "navigation": {
-      "brandTitle": "AI对冲基金",
+      "brandTitle": "AI投资大师",
       "home": "首页",
       "analysis": "分析",
       "explore": "探索",
@@ -22,7 +22,7 @@
       "aiMasters": "AI大师"
     },
     "header": {
-      "title": "AI对冲基金",
+      "title": "AI投资大师",
       "subtitle": "17位世界顶级投资大师为您提供专业的股票分析"
     },
     "analysisForm": {
@@ -110,7 +110,7 @@
     },
     "dashboard": {
       "hero": {
-        "title": "AI对冲基金平台",
+        "title": "AI投资大师",
         "subtitle": "利用17位传奇投资者的智慧，结合人工智能的力量。通过数据驱动的洞察做出更明智的投资决策。",
         "startAnalysis": "开始分析",
         "explore": "探索"
